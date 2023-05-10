@@ -38,21 +38,6 @@ def annotate_view(request):
        # else return 404 error:
         return HttpResponse("404 error")
 
-# Path: audio_annotate.html:
-
-def annotate_label_experiment(request):
-    if request.method == "POST":
-        print(request.POST)
-        audio_file = request.POST.get('audio_file')
-        print(audio_file)
-        # load the audio file:
-        context = {'audio_file': audio_file,
-                    'audio_file_path': settings.MEDIA_URL + 'audio/' + audio_file
-                }
-        # get response from the form:
-        response = request.POST.get('response')
-        print(response)
-        return render(request, 'annotate_label_experiment.html', context)
     
 
 
