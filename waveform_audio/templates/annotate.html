@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Audio Annotations</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/waveform.css' %}"> -->
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+
+</head>
+
+<body>
+    <h1>Audio Annotations</h1>
+    <h2>Annotation for "{{ audio_file }}"</h2>
+
+    <div id="waveform"></div>
+
+    <div class="waveform_buttons">
+        <button id="playPause" type="button">playPause</button>
+        <button id="stop" type="button">Stop</button>
+        
+    </div>
+    <div class="waveform_label">
+        <div id="start_time"></div>
+        <div id="end_time"></div>
+        <select id="label">
+            <option value="laugh">laugh</option>
+            <option value="no laugh">no laugh</option>
+            <option value="crowd">crowd</option>
+        </select>
+        <button id="addtotable" type="button" onclick="addtoTable();">Add to table</button>
+
+    </div>
+    <div class="waveform_annonation_table">
+        <table id="annotation_table">
+            <tr>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Label</th>
+                <th >Delete</th>
+                <th>Show Region</th>
+            </tr>
+        
+        </table>
+        <div id="table_buttons">
+            <button id="save_table" type="button" onclick="saveAnnotations();">Save Annotations</button>
+            <button id="delete_table" type="button" onclick="deleteAll();">Delete All</button>
+            <button id="show regions" type="button" onclick="showRegionsTable();">Show Regions</button>
+        </div>
+    </div>
+
+    <div id="subtitleContainer"></div>
+
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.regions.js"></script>
+    <script src="{% static 'js/waveannotate.js' %}"></script>>
+    <script>
+        audio_file_path = "{{ audio_file_path }}";
+        console.log(audio_file_path);        
+        audiotoWave(audio_file_path);
+
+    </script>
+
+
+   
+
+        
+</body>
+
+</html>

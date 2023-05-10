@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Audio Annotations</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<div>   
+    <h1>Audio Annotations</h1>
+    <h2>Choose an audio file to annotate:</h2>
+
+    <div class="audio_files">
+        <p>Audio files:</p>
+        <ul>
+            {% for audio_file in audio_files %}
+                <li>{{ audio_file }}</li>
+            {% endfor %}
+        </ul>
+        <form action="{% url 'annotate' %}" method="post" name="selectform" id="selectform">
+            {% csrf_token %}
+            <select name="audio_file">
+                {% for audio_file in audio_files %}
+                <option value="{{ audio_file }}">{{ audio_file }}</option>
+                {% endfor %}
+            </select>
+        <input type="submit" value="annotate"> 
+        </form>
+     </div>
+</div>
+</html>
