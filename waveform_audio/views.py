@@ -1,10 +1,13 @@
 import os
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.template import loader
 from .utils import get_waveform_data
+import json
+from django.views.decorators.csrf import csrf_exempt
+import pandas as pd
 
 # Create your views here:
 
@@ -43,7 +46,23 @@ def annotate_view(request):
        # else return 404 error:
         return HttpResponse("404 error")
 
+@csrf_exempt
+def save_annotations(request):
     
+    if request.method == "POST":
+        # annotation_table = request.POST.get("annotation_table")
+        data = json.loads(request.body)
+        annotation_table = json.loads(data.get("annotation_table"))
+        table = pd.DataFrame(annotation_table)
+        # Process the annotation_table data as needed
+        print(annotation_table)
+        print(table)
+        # Save the annotation_table data to a file:
+        table.to_csv(settings.MEDIA_ROOT + '/annotations.csv', index=False)
+      
+        return JsonResponse({"status": "success"})
+
+    return JsonResponse({"status": "error"})
 
 
 

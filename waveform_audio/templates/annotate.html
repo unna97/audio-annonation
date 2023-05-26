@@ -34,7 +34,7 @@
 
     </div>
     <div class="waveform_annonation_table">
-        <table id="annotation_table">
+        <table id="annotation_table" name="annotation_table">
             <tr>
                 <th>Start Time</th>
                 <th>End Time</th>
@@ -66,7 +66,8 @@
     </script>
 
 
-   
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 
         
 </body>
