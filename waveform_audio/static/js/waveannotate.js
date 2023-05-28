@@ -68,7 +68,7 @@ function addtoTable(){
 
 }
 
-function createWaveformer(audio_file_path, regions){
+function createWaveformer(audio_file_path, regions, waveform){
 
     var wavesurfer = WaveSurfer.create({
         container: '#waveform',
@@ -81,7 +81,7 @@ function createWaveformer(audio_file_path, regions){
         height: 150,
 
         mediaControls: true,
-        backend: 'MediaElement',
+        // backend: 'MediaElement',
 
         scrollParent: true,
 
@@ -97,9 +97,19 @@ function createWaveformer(audio_file_path, regions){
         ],
         // enable drag selection:
         dragSelection: true,
-    });
 
-    wavesurfer.load(audio_file_path);
+        onended: function () {
+            console.log('Finished playing');
+            wavesurfer.seek(0)
+        },
+        buffer: 1024 * 1024 * 10 // 10 MB buffer
+    });
+    //get the waveform which is given as {"waveform": [0.1, 0.2, 0.3]}:\
+    console.log("loading new code")
+    waveform = JSON.parse(waveform)['waveform'];
+    console.log("waveform is: " + waveform);
+    var waveform = waveform["waveform"];
+    wavesurfer.load(audio_file_path, waveform);
     // return the wavesurfer object:
     return wavesurfer;
 }
@@ -127,7 +137,7 @@ function showRegionsTable(){
 
 
 function audiotoWave(
-    audio_file_path
+    audio_file_path, waveform
     ) {
 
 
@@ -154,7 +164,7 @@ function audiotoWave(
         }
     ];
 
-    wavesurfer = createWaveformer(audio_file_path, regions);
+    wavesurfer = createWaveformer(audio_file_path, regions, waveform);
 
     var playButton = document.querySelector('#playPause');
     var stopButton = document.querySelector('#stop');
@@ -204,4 +214,55 @@ function audiotoWave(
             }
         });
     });
+}
+function saveAnnotations() {
+    var annotationTable = [];
+    var table = document.getElementById("annotation_table");
+    var rows = table.rows;
+    // for each row, get the start and end times and label:
+    for (var i = 1; i < rows.length; i++) {
+        var start_time = rows[i].cells[0].innerHTML;
+        var end_time = rows[i].cells[1].innerHTML;
+        var label = rows[i].cells[2].innerHTML;
+        // add the row to the annotation table:
+        annotationTable.push({
+            "start_time": start_time,
+            "end_time": end_time,
+            "label": label
+        });
+    }
+
+    console.log(annotationTable);
+    // Send the annotation table data to Django
+    // var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    console.log(csrfToken);
+
+    var requestData = {
+        "annotation_table": JSON.stringify(annotationTable),
+        "csrfmiddlewaretoken": csrfToken
+    };
+
+    // $.ajax({
+    //     url: "/save_annotations/",
+    //     type: "POST",
+    //     data: {
+    //         "annotation_table": JSON.stringify(annotationTable),
+    //         "csrfmiddlewaretoken": csrfToken
+    //     },
+    //     success: function (response) {
+    //         console.log(response);
+    //     }
+    // });
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/save_annotations/");
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            console.log(xhr.responseText);
+        }
+    };
+    xhr.send(JSON.stringify(requestData));
+
 }

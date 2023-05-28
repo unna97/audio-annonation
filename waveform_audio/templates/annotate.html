@@ -34,7 +34,7 @@
 
     </div>
     <div class="waveform_annonation_table">
-        <table id="annotation_table">
+        <table id="annotation_table" name="annotation_table">
             <tr>
                 <th>Start Time</th>
                 <th>End Time</th>
@@ -58,13 +58,16 @@
     <script src="{% static 'js/waveannotate.js' %}"></script>>
     <script>
         audio_file_path = "{{ audio_file_path }}";
-        console.log(audio_file_path);        
-        audiotoWave(audio_file_path);
+        waveform = '{{ waveform|safe }}';                     
+        console.log(audio_file_path);
+        console.log(waveform);        
+        audiotoWave(audio_file_path, waveform);
 
     </script>
 
 
-   
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 
         
 </body>
