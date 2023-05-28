@@ -20,7 +20,8 @@ def index_view(request):
     # get list from Media folder:
     audio_files = FileSystemStorage().listdir('audio')[1]
     # get only mp3 files or wav files:
-    audio_files = [file for file in audio_files if file.endswith('.mp3') or file.endswith('.wav')]
+    audio_files = [file for file in audio_files if file.endswith('.mp3') or file.endswith('.wav') or 
+                   file.endswith('.mp4') ]
     context = {'audio_files': audio_files}
     template = 'index.html'
     return render(request, template, context)

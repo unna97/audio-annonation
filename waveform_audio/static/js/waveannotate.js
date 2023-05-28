@@ -81,7 +81,7 @@ function createWaveformer(audio_file_path, regions, waveform){
         height: 150,
 
         mediaControls: true,
-        backend: 'MediaElement',
+        // backend: 'MediaElement',
 
         scrollParent: true,
 
