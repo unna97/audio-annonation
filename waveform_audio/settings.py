@@ -76,7 +76,7 @@ TEMPLATES = [
 ]
 # Add static files:
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    # os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'waveform_audio/static'),
 ]
 # the static url to use when referring to static files located in STATIC_ROOT:
