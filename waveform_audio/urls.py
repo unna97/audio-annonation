@@ -21,9 +21,9 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', views.index, name='trial'),
     path('', views.index_view, name='index'),
     path('annotate/', views.annotate_view, name='annotate'),
     path('save_annotations/', views.save_annotations, name='save_annotations'),
+    path('update_database/', views.update_database, name='update_database'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
