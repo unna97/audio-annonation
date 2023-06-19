@@ -167,3 +167,11 @@ waveform_audio/static/media
 
 # Playground:
 playground/
+
+# Django:
+db.sqlite3
+*.log
+*.pot
+*.pyc
+__pycache__/
+migrations/
