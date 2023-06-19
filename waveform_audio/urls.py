@@ -19,6 +19,8 @@ from . import views
 from django.conf.urls.static import static
 from django.conf import settings
 
+app_name = 'waveform_audio'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index_view, name='index'),

@@ -233,6 +233,8 @@ function saveAnnotations() {
     }
 
     console.log(annotationTable);
+
+    console.log(audio_file_path);
     // Send the annotation table data to Django
     // var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -240,20 +242,10 @@ function saveAnnotations() {
 
     var requestData = {
         "annotation_table": JSON.stringify(annotationTable),
-        "csrfmiddlewaretoken": csrfToken
+        "csrfmiddlewaretoken": csrfToken,
+        "audio_file_path": audio_file_path
     };
 
-    // $.ajax({
-    //     url: "/save_annotations/",
-    //     type: "POST",
-    //     data: {
-    //         "annotation_table": JSON.stringify(annotationTable),
-    //         "csrfmiddlewaretoken": csrfToken
-    //     },
-    //     success: function (response) {
-    //         console.log(response);
-    //     }
-    // });
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/save_annotations/");
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
