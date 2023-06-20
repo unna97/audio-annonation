@@ -57,11 +57,12 @@ def annotate_view(request):
         print(audio_file)
         # get waveform data:
         waveform = get_waveform_data(audio_file)
-            
+        labels = ['laugh','crowd','other']
         # load the audio file:
         context = {'audio_file': audio_file,
                    'audio_file_path': settings.MEDIA_URL + 'audio/' + audio_file,
-                   'waveform': waveform
+                   'waveform': waveform,
+                    'labels': labels
                 }
     
         return render(request, 'annotate.html', context)
