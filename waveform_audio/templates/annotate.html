@@ -57,10 +57,8 @@
     <script src="{% static 'js/waveannotate.js' %}"></script>>
     <script>
         audio_file_path = "{{ audio_file_path }}";
-        waveform = '{{ waveform|safe }}';                     
         console.log(audio_file_path);
-        console.log(waveform);        
-        audiotoWave(audio_file_path, waveform);
+        audiotoWave(audio_file_path);
 
     </script>
 
