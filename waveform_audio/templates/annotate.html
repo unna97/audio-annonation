@@ -6,7 +6,6 @@
     <meta charset="utf-8">
     <title>Audio Annotations</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/waveform.css' %}"> -->
     <script src="https://unpkg.com/wavesurfer.js"></script>
 
 </head>
@@ -26,9 +25,9 @@
         <div id="start_time"></div>
         <div id="end_time"></div>
         <select id="label">
-            <option value="laugh">laugh</option>
-            <option value="no laugh">no laugh</option>
-            <option value="crowd">crowd</option>
+            {% for label in labels %}
+            <option value="{{ label }}">{{ label }}</option>
+            {% endfor %}
         </select>
         <button id="addtotable" type="button" onclick="addtoTable();">Add to table</button>
 
@@ -58,10 +57,8 @@
     <script src="{% static 'js/waveannotate.js' %}"></script>>
     <script>
         audio_file_path = "{{ audio_file_path }}";
-        waveform = '{{ waveform|safe }}';                     
         console.log(audio_file_path);
-        console.log(waveform);        
-        audiotoWave(audio_file_path, waveform);
+        audiotoWave(audio_file_path);
 
     </script>
 

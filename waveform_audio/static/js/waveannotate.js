@@ -68,7 +68,7 @@ function addtoTable(){
 
 }
 
-function createWaveformer(audio_file_path, regions, waveform){
+function createWaveformer(audio_file_path, regions){
 
     var wavesurfer = WaveSurfer.create({
         container: '#waveform',
@@ -104,12 +104,8 @@ function createWaveformer(audio_file_path, regions, waveform){
         },
         buffer: 1024 * 1024 * 10 // 10 MB buffer
     });
-    //get the waveform which is given as {"waveform": [0.1, 0.2, 0.3]}:\
-    console.log("loading new code")
-    waveform = JSON.parse(waveform)['waveform'];
-    console.log("waveform is: " + waveform);
-    var waveform = waveform["waveform"];
-    wavesurfer.load(audio_file_path, waveform);
+    
+    wavesurfer.load(audio_file_path);
     // return the wavesurfer object:
     return wavesurfer;
 }
@@ -137,7 +133,7 @@ function showRegionsTable(){
 
 
 function audiotoWave(
-    audio_file_path, waveform
+    audio_file_path
     ) {
 
 
@@ -164,7 +160,7 @@ function audiotoWave(
         }
     ];
 
-    wavesurfer = createWaveformer(audio_file_path, regions, waveform);
+    wavesurfer = createWaveformer(audio_file_path, regions);
 
     var playButton = document.querySelector('#playPause');
     var stopButton = document.querySelector('#stop');

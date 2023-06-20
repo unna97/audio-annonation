@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.template import loader
-from .utils import get_waveform_data
 import json
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
@@ -56,12 +55,11 @@ def annotate_view(request):
         audio_file = request.POST.get('audio_file')
         print(audio_file)
         # get waveform data:
-        waveform = get_waveform_data(audio_file)
-            
+        labels = ['laugh','crowd','other']
         # load the audio file:
         context = {'audio_file': audio_file,
                    'audio_file_path': settings.MEDIA_URL + 'audio/' + audio_file,
-                   'waveform': waveform
+                   'labels': labels
                 }
     
         return render(request, 'annotate.html', context)
