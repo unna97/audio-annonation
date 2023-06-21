@@ -27,4 +27,5 @@ urlpatterns = [
     path("annotate/", views.annotate_view, name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
     path("update_database/", views.update_database, name="update_database"),
+    path("clean_database/", views.clean_database, name="clean_database"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -51,6 +51,13 @@
     </div>
 
     <div id="subtitleContainer"></div>
+    <div id="databaseTable">
+        <form method="post" action="{% url 'clean_database' %}">
+            {% csrf_token %}
+            <input type="text" name="audio_file" value="{{ audio_file }}" readonly>
+            <button type="submit">Clean Database</button>
+        </form>
+    </div>
 
     <script src="https://unpkg.com/wavesurfer.js@6.0.0"></script>
     <script src="https://unpkg.com/wavesurfer.js@6.0.0/dist/plugin/wavesurfer.regions.min.js"></script>
