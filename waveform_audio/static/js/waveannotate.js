@@ -211,7 +211,8 @@ function audiotoWave(
         });
     });
 }
-function saveAnnotations() {
+function saveAnnotationsXHR() {
+    // this function saves the annotations to the database using an XHR request
     var annotationTable = [];
     var table = document.getElementById("annotation_table");
     var rows = table.rows;
@@ -253,4 +254,44 @@ function saveAnnotations() {
     };
     xhr.send(JSON.stringify(requestData));
 
+}
+function save_annotationsFetch(){
+    // this function saves the annotations to the database using a fetch request
+
+    var annotationTable = [];
+    var table = document.getElementById("annotation_table");
+    var rows = table.rows;
+    // for each row, get the start and end times and label:
+    for (var i = 1; i < rows.length; i++) {
+        var start_time = rows[i].cells[0].innerHTML;
+        var end_time = rows[i].cells[1].innerHTML;
+        var label = rows[i].cells[2].innerHTML;
+        // add the row to the annotation table:
+        annotationTable.push({
+            "start_time": start_time,
+            "end_time": end_time,
+            "label": label
+        });
+    }
+    csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    requestData = {
+        "annotation_table": JSON.stringify(annotationTable),
+        "csrfmiddlewaretoken": csrfToken,
+        "audio_file_path": audio_file_path   
+    }
+
+    fetch('/save_annotations/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(requestData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        }
+        )
 }
