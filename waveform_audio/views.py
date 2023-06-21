@@ -87,5 +87,5 @@ def save_annotations(request):
                 annotation=row["label"],
             )
         # provide a popup message that annotations have been saved:
-        return HttpResponse("Annotations have been saved")
-    return HttpResponse("404 error")
+        return JsonResponse({"message": "Annotations have been saved"})
+    return JsonResponse({"message": "404 error"})
