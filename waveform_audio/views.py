@@ -101,12 +101,18 @@ def clean_database(request):
         annotations = pd.DataFrame(
             list(
                 annotations.values(
-                    "audio_file__file", "start_time", "end_time", "annotation"
+                    "audio_file__file", "start_time", "end_time", "annotation", "timestamp", "id"
                 )
             )
         )
         print(annotations)
-
-        return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
+        if annotations.empty:
+            return JsonResponse({"message": "No annotations found"})
+        template = "annotations_dashboard.html"
+        annotations['start_time'] = annotations['start_time'].apply(lambda x: x.strftime('%H:%M:%S'))
+        annotations['end_time'] = annotations['end_time'].apply(lambda x: x.strftime('%H:%M:%S'))
+        context = {"annotations": annotations.to_dict(orient='records')}
+        return render(request, template, context)
+        #return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
     else:
         return HttpResponse("404 error")
