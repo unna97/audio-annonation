@@ -89,3 +89,30 @@ def save_annotations(request):
         # provide a popup message that annotations have been saved:
         return JsonResponse({"message": "Annotations have been saved"})
     return JsonResponse({"message": "404 error"})
+
+def clean_database(request):
+    if request.method == "POST":
+        # get annotations from database for the current audio file:
+        audio_file = request.POST.get("audio_file")
+        print(audio_file)
+        # get annotations from database:
+        annotations = AudioAnnotation.objects.filter(audio_file__file=audio_file)
+        # convert annotations to pandas dataframe:
+        annotations = pd.DataFrame(
+            list(
+                annotations.values(
+                    "audio_file__file", "start_time", "end_time", "annotation", "timestamp", "id"
+                )
+            )
+        )
+        print(annotations)
+        if annotations.empty:
+            return JsonResponse({"message": "No annotations found"})
+        template = "annotations_dashboard.html"
+        annotations['start_time'] = annotations['start_time'].apply(lambda x: x.strftime('%H:%M:%S'))
+        annotations['end_time'] = annotations['end_time'].apply(lambda x: x.strftime('%H:%M:%S'))
+        context = {"annotations": annotations.to_dict(orient='records')}
+        return render(request, template, context)
+        #return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
+    else:
+        return HttpResponse("404 error")

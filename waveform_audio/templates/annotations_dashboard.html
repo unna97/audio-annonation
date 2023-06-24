@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Clean Audio Annotations</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div>
+        <h1>Annotations for {{ audio_file }}</h1>
+    </div>
+    <div id="table_display">
+        <table class="sortable-table">
+            <tr>
+                <th>Start Time<span class="sort-arrow"></span></th>
+                <th>End Time<span class="sort-arrow"></span></th>
+                <th>Annotation<span class="sort-arrow"></span></th>
+                <th>Updated at<span class="sort-arrow"></span></th>
+                <th>Annotation ID<span class="sort-arrow"></span></th>
+                <th>Remove</th>
+            </tr>
+            {% for annotation in annotations %}
+            <tr>
+                <td>{{ annotation.start_time }}</td>
+                <td>{{ annotation.end_time }}</td>
+                <td>{{ annotation.annotation }}</td>
+                <td>{{ annotation.timestamp }}</td>
+                <td>{{ annotation.id }} </td>
+
+                <td>
+                    <form method="post" action="{% url 'index' %}">
+                        
+                        {% csrf_token %}
+                        <input type="hidden" name="annotation_id" value="{{ annotation.id }}">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
