@@ -1,7 +1,84 @@
 /* background color of the page */
 body {
-  background-color: #d0d862;
+  background-color: #faefe0;
+  /*have font be hagrid:*/
+  font-family: "Hagrid", sans-serif;
+  
 }
+/* style the header */
+h1 {
+  text-align: center;
+  font-size: 50px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #d46bca;
+}
+h2 {
+  background-color: #ccbb6c;
+}
+button {
+  padding: 10px 20px;
+  background-color: #fd883d;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #fdaa7b;
+}
+/* style the select dropdown */
+/* select {
+  padding: 10px 20px;
+  background-color: #553555;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+} */
+/* Style the select dropdown */
+select {
+  /* Set the desired width */
+  /* width: 200px; */
+  /* Remove default styling */
+
+  /* Add custom background, border, and text colors */
+  background-color: #DABAD6;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  color: #feffff;
+  /* Add padding and margin */
+  padding: 8px;
+  margin: 4px 0;
+  /* Add custom font and cursor */
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+
+/* Style the dropdown arrow */
+select::after {
+  content: '\25BC';
+  /* Unicode character for a downward-pointing triangle */
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  /* Add custom arrow color */
+  color: #666;
+  /* Adjust arrow size and spacing */
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Style the select options */
+/* select option {
+  /* Add custom background and text colors */
+  /* background-color: #f2f2f2;
+  color: #333;
+} */ */
 
 /*style audio player by id*/
 
@@ -201,4 +278,25 @@ td button:hover {
   font-weight: bold;
   text-align: center;
   pointer-events: none;
+}
+
+/* let associated-image and dropdown-menu appear beside each other i.e relative to each other */
+#associated-image {
+  display: inline-block;
+  width: 50%;
+}
+#dropdown-audio {
+  display: inline-block;
+  color: #fff;
+/* relative to associated image place the dropdown menu */
+  position: absolute;
+  left: 70%;
+  top: 60%;
+  
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 30px 30px;  
 }
