@@ -148,5 +148,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = "/media/"  # this is the url to the media folder
 MEDIA_ROOT = os.path.join(
-    BASE_DIR, "waveform_audio\\static\\media"
+    BASE_DIR, "waveform_audio", "static", "media"
 )  # this is the path to the media folder
