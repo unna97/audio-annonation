@@ -14,6 +14,9 @@ from pathlib import Path
 import os
 import psycopg2 as pg
 
+# configs imports
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -94,11 +97,11 @@ WSGI_APPLICATION = "waveform_audio.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "waveform_audio",
-        "USER": "postgres",
-        "PASSWORD": "unnati",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": DB_NAME,
+        "USER": DB_USER,
+        "PASSWORD": DB_PASSWORD,
+        "HOST": DB_HOST,
+        "PORT": DB_PORT,
     }
 }
 
@@ -148,5 +151,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = "/media/"  # this is the url to the media folder
 MEDIA_ROOT = os.path.join(
-    BASE_DIR, "waveform_audio\\static\\media"
+    BASE_DIR, "waveform_audio", "static", "media"
 )  # this is the path to the media folder
