@@ -3,7 +3,7 @@ from django.db import models
 
 class AudioFile(models.Model):
     id = models.AutoField(primary_key=True)
-    file = models.FileField(upload_to="audio/")
+    file = models.FileField(upload_to="audio/", db_index=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
