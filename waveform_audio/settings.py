@@ -48,12 +48,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 
 ROOT_URLCONF = "waveform_audio.urls"
@@ -82,8 +84,8 @@ TEMPLATES = [
 ]
 # Add static files:
 STATICFILES_DIRS = [
-    # os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, "waveform_audio/static"),
+    
 ]
 # the static url to use when referring to static files located in STATIC_ROOT:
 STATIC_URL = "/static/"
@@ -153,3 +155,9 @@ MEDIA_URL = "/media/"  # this is the url to the media folder
 MEDIA_ROOT = os.path.join(
     BASE_DIR, "waveform_audio", "static", "media"
 )  # this is the path to the media folder
+
+# Static root:
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Whitenoise settings
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
