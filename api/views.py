@@ -1,11 +1,8 @@
-from django.shortcuts import render
+from re import A
 from .serializers import *
 from rest_framework import generics
-from waveform_audio.models import AudioAnnotation
-from rest_framework import viewsets
+from waveform_audio.models import AudioAnnotation,AudioFile
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 
@@ -25,3 +22,17 @@ class AudioAnnotationViewSet(APIView):
 
         return Response(serializer.data)
 
+    def post(self, request):
+        serializer = AudioAnnotationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    
+class AudioFileListAPIView(generics.ListCreateAPIView):
+    queryset = AudioFile.objects.all()
+    serializer_class = AudioFileSerializer
+
+class AudioFileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = AudioFile.objects.all()
+    serializer_class = AudioFileSerializer
