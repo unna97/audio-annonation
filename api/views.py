@@ -1,37 +1,38 @@
 from .serializers import *
-from rest_framework import generics
-from waveform_audio.models import AudioAnnotation,AudioFile
+from rest_framework import generics, status
+from waveform_audio.models import AudioFile
 from rest_framework.response import Response
-from rest_framework.views import APIView
+import os
 
 
-
-
-class AudioAnnotationViewSet(APIView):
-    
-    def get(self, request):
-        #filter by audio_file:
-        audio_file = request.query_params.get('audio_file', None)
-        if audio_file is not None:
-            audio_annotations = AudioAnnotation.objects.filter(audio_file=audio_file)
-        else:
-            audio_annotations = AudioAnnotation.objects.all()
-        
-        serializer = AudioAnnotationSerializer(audio_annotations, many=True)
-
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = AudioAnnotationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-    
-class AudioFileListAPIView(generics.ListCreateAPIView):
-    queryset = AudioFile.objects.all()
-    serializer_class = AudioFileSerializer
 
 class AudioFileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = AudioFile.objects.all()
+    serializer_class = AudioFileSerializer #use HyperlinkedModelSerializer to get url field
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Get the file path and handle file deletion
+        file_path = instance.file.path
+        try:
+            # Check if the file exists before attempting to delete
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            # Log the error or handle it based on your application's requirements
+            # In a production environment, consider logging errors to a file or a monitoring system
+            pass
+
+        # Perform the standard destroy operation to delete the record from the database
+        self.perform_destroy(instance)
+
+        # Respond with a success status
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class AudioFileUploadAPIView(generics.CreateAPIView):
     serializer_class = AudioFileSerializer
+    queryset = AudioFile.objects.all()
+
+class AudioFileListAPIView(generics.ListAPIView):
+    serializer_class = AudioFileSerializer
+    queryset = AudioFile.objects.all()
