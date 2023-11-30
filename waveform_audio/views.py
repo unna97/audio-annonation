@@ -1,4 +1,6 @@
-import os
+import time
+import timeit
+from typing import Any
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -8,6 +10,9 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 from .models import AudioFile, AudioAnnotation
+from api.views import AudioFileDetailAPIView, AudioFileListAPIView
+from django.views.generic import TemplateView
+
 
 
 def update_database(request):
@@ -54,7 +59,7 @@ def annotate_view(request):
         # load the audio file:
         context = {
             "audio_file": audio_file,
-            "audio_file_path": settings.MEDIA_URL + "audio/" + audio_file,
+            "audio_file_path": AudioFile.objects.get(id=audio_file).file.url,
             "labels": labels,
         }
 
@@ -116,3 +121,18 @@ def clean_database(request):
         #return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
     else:
         return HttpResponse("404 error")
+
+# use template view to render the annotations dashboard:
+
+class AudioFileAvailableView(TemplateView):
+    template_name = "index.html"
+    
+    #time the function:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        audio_files = AudioFile.objects.all()
+        context["audio_files"] = audio_files
+
+
+        return context

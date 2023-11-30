@@ -12,12 +12,7 @@
     <h2>Choose an audio file to annotate:</h2>
 
     <div class="audio_files">
-        <!-- <p>Audio files:</p> -->
-        <!-- <ul>
-            {% for audio_file in audio_files %}
-                <li>{{ audio_file }}</li>
-            {% endfor %}
-        </ul> -->
+        
         <div class="audio-select" id="associated-image">
             <img src="{% static 'media/images/chimpanzee.svg' %}" alt="My Image">
         </div>
@@ -26,7 +21,7 @@
                 {% csrf_token %}
                 <select name="audio_file">
                     {% for audio_file in audio_files %}
-                    <option value="{{ audio_file }}">{{ audio_file }}</option>
+                    <option value="{{ audio_file.id }}">{{ audio_file.file.name }}</option>
                     {% endfor %}
                 </select>
             <button type="submit">annotate</button>
