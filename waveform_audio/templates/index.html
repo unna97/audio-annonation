@@ -29,9 +29,9 @@
         </div>
      </div>
 
-    <form method="post" action="{% url 'update_database' %}">
+    <form method="post" action="{% url 'upload' %}">
         {% csrf_token %}
-        <button type="submit">Update Database</button>
+        <button type="submit">Upload New File</button>
     </form>
 </div>
 </html>

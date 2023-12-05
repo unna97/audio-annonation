@@ -1,52 +1,17 @@
-import time
-import timeit
 from typing import Any
-from django.core.files.storage import FileSystemStorage
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from django.conf import settings
-from django.template import loader
 import json
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
+
 from .models import AudioFile, AudioAnnotation
-from api.views import AudioFileDetailAPIView, AudioFileListAPIView
+
 from django.views.generic import TemplateView
-
-
-
-def update_database(request):
-    if request.method == "POST":
-        audio_files = FileSystemStorage().listdir("audio")[1]
-        accepted_format = ["mp3", "wav", "mp4"]
-        # get only mp3 files or wav files:
-        for file in audio_files:
-            for format in accepted_format:
-                if file.endswith(format):
-                    # check if file is in database:
-                    print("checking if file is in database")
-                    if not AudioFile.objects.filter(file=file).exists():
-                        # add file to database:
-                        print("adding file to database")
-                        AudioFile.objects.create(file=file)
-        # after doing this redirect to index page that will pull data from database:
-        return redirect("index")
-    else:
-        return HttpResponse("404 error")
-
-
-def index_view(request):
-    try:
-        audio_files = AudioFile.objects.all()
-    except AudioFile.DoesNotExist:
-        # call update_database function:
-        update_database(request)
-        audio_files = AudioFile.objects.all()
-
-    audio_files = [file.file.name for file in audio_files]
-    context = {"audio_files": audio_files}
-    template = "index.html"
-    return render(request, template, context)
+from django.views.generic.edit import FormView
+from .forms import AudioFileForm
+from django.urls import reverse
+import requests
 
 
 def annotate_view(request):
@@ -95,6 +60,7 @@ def save_annotations(request):
         return JsonResponse({"message": "Annotations have been saved"})
     return JsonResponse({"message": "404 error"})
 
+
 def clean_database(request):
     if request.method == "POST":
         # get annotations from database for the current audio file:
@@ -106,7 +72,12 @@ def clean_database(request):
         annotations = pd.DataFrame(
             list(
                 annotations.values(
-                    "audio_file__file", "start_time", "end_time", "annotation", "timestamp", "id"
+                    "audio_file__file",
+                    "start_time",
+                    "end_time",
+                    "annotation",
+                    "timestamp",
+                    "id",
                 )
             )
         )
@@ -114,25 +85,63 @@ def clean_database(request):
         if annotations.empty:
             return JsonResponse({"message": "No annotations found"})
         template = "annotations_dashboard.html"
-        annotations['start_time'] = annotations['start_time'].apply(lambda x: x.strftime('%H:%M:%S'))
-        annotations['end_time'] = annotations['end_time'].apply(lambda x: x.strftime('%H:%M:%S'))
-        context = {"annotations": annotations.to_dict(orient='records')}
+        annotations["start_time"] = annotations["start_time"].apply(
+            lambda x: x.strftime("%H:%M:%S")
+        )
+        annotations["end_time"] = annotations["end_time"].apply(
+            lambda x: x.strftime("%H:%M:%S")
+        )
+        context = {"annotations": annotations.to_dict(orient="records")}
         return render(request, template, context)
-        #return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
+        # return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
     else:
         return HttpResponse("404 error")
 
+
 # use template view to render the annotations dashboard:
+
 
 class AudioFileAvailableView(TemplateView):
     template_name = "index.html"
-    
-    #time the function:
+
+    # time the function:
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
         audio_files = AudioFile.objects.all()
         context["audio_files"] = audio_files
 
-
         return context
+
+
+class UploadAudioFileView(FormView):
+    template_name = "upload.html"
+    form_class = AudioFileForm
+    # Success calls the api view of the AudioFileListAPIView
+    success_url = "/api/audio-files/"
+    # success_url = reverse('api:audio-file-upload')
+
+    def form_valid(self, form):
+        # save the file to the database:
+        audio_file = form.cleaned_data["audio_file"]
+        audio_file_name = audio_file.name
+
+        # Prepare the API endpoint URL
+        if form.is_valid():
+            api_url = reverse("api:audio-file-upload")
+            api_url_with_scheme = self.request.build_absolute_uri(api_url)
+
+            file = {"file": (audio_file_name, audio_file)}
+            response = requests.post(api_url_with_scheme, files=file)
+            if response.status_code == 201:
+                return super().form_valid(form)
+            return self.form_invalid(form, api_response=response.json())
+
+        return super().form_invalid(form)
+
+    def form_invalid(self, form, api_response=None):
+        # get a popup message on the html page that the file is not valid:
+        if api_response not in (None, {}):
+            form.add_error(None, api_response)
+
+        return super().form_invalid(form)
