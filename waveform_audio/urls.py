@@ -23,15 +23,11 @@ app_name = "waveform_audio"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    
-    
     path("", views.AudioFileAvailableView.as_view(), name="index"),
-
     path("annotate/", views.annotate_view, name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
-    path("update_database/", views.update_database, name="update_database"),
+    path("upload/", views.UploadAudioFileView.as_view(), name="upload"),
     path("clean_database/", views.clean_database, name="clean_database"),
-    # example url:
     # API urls:
-    path("api/", include("api.urls")),
+    path("api/", include(("api.urls", "api")), name="api"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
