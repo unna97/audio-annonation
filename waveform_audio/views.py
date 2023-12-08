@@ -9,6 +9,8 @@ from .models import AudioFile, AudioAnnotation
 
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
 from .forms import AudioFileForm
 from django.urls import reverse
 import requests
@@ -61,46 +63,7 @@ def save_annotations(request):
     return JsonResponse({"message": "404 error"})
 
 
-def clean_database(request):
-    if request.method == "POST":
-        # get annotations from database for the current audio file:
-        audio_file = request.POST.get("audio_file")
-        print(audio_file)
-        # get annotations from database:
-        annotations = AudioAnnotation.objects.filter(audio_file__file=audio_file)
-        # convert annotations to pandas dataframe:
-        annotations = pd.DataFrame(
-            list(
-                annotations.values(
-                    "audio_file__file",
-                    "start_time",
-                    "end_time",
-                    "annotation",
-                    "timestamp",
-                    "id",
-                )
-            )
-        )
-        print(annotations)
-        if annotations.empty:
-            return JsonResponse({"message": "No annotations found"})
-        template = "annotations_dashboard.html"
-        annotations["start_time"] = annotations["start_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
-        annotations["end_time"] = annotations["end_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
-        context = {"annotations": annotations.to_dict(orient="records")}
-        return render(request, template, context)
-        # return JsonResponse({"message": "Annotations have been saved", "annotations": annotations.to_json()})
-    else:
-        return HttpResponse("404 error")
-
-
 # use template view to render the annotations dashboard:
-
-
 class AudioFileAvailableView(TemplateView):
     template_name = "index.html"
 
@@ -145,3 +108,52 @@ class UploadAudioFileView(FormView):
             form.add_error(None, api_response)
 
         return super().form_invalid(form)
+
+# show save annotations for the selected audio file:
+@method_decorator(require_http_methods(["POST"]), name="dispatch")
+class AudioAnnotationsView(TemplateView):
+    template_name = "annotations_dashboard.html"
+    # this will be called by a POST request i.e when the user clicks on the button:
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        # get the audio file id:
+        audio_file_id = self.request.POST.get("audio_file")
+        print(audio_file_id)
+
+        #TODO: Use API to get the annotations
+         # get annotations from database by id:
+        annotations = AudioAnnotation.objects.filter(audio_file__id=audio_file_id)
+
+        annotations = pd.DataFrame(
+            list(
+                annotations.values(
+                    "audio_file__file",
+                    "start_time",
+                    "end_time",
+                    "annotation",
+                    "timestamp",
+                    "id",
+                )
+            )
+        )
+        print(annotations)
+        if annotations.empty:
+           message = "No annotations found"
+           context["message"] = message
+           return context
+
+        annotations["start_time"] = annotations["start_time"].apply(
+            lambda x: x.strftime("%H:%M:%S")
+        )
+        annotations["end_time"] = annotations["end_time"].apply(
+            lambda x: x.strftime("%H:%M:%S")
+        )
+        context = {"annotations": annotations.to_dict(orient="records")}
+        
+       
+        return context
+
+    # this a post only view:
+    def post(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
