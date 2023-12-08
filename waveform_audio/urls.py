@@ -24,7 +24,7 @@ app_name = "waveform_audio"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.AudioFileAvailableView.as_view(), name="index"),
-    path("annotate/", views.annotate_view, name="annotate"),
+    path("annotate/", views.AnnotateAudioFileView.as_view(), name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
     path("upload/", views.UploadAudioFileView.as_view(), name="upload"),
     path("clean_database/", views.AudioAnnotationsView.as_view(), name="clean_database"),

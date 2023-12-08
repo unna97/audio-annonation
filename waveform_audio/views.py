@@ -15,33 +15,13 @@ from .forms import AudioFileForm
 from django.urls import reverse
 import requests
 
-
-def annotate_view(request):
-    if request.method == "POST":
-        print(request.POST)
-        audio_file = request.POST.get("audio_file")
-        print(audio_file)
-        # get waveform data:
-        labels = ["laugh", "crowd", "other"]
-        # load the audio file:
-        context = {
-            "audio_file": audio_file,
-            "audio_file_path": AudioFile.objects.get(id=audio_file).file.url,
-            "labels": labels,
-        }
-
-        return render(request, "annotate.html", context)
-    else:
-        # else return 404 error:
-        return HttpResponse("404 error")
-
-
 @csrf_exempt
 def save_annotations(request):
     if request.method == "POST":
         data = json.loads(request.body)
         annotation_table = json.loads(data.get("annotation_table"))
-        audio_file = data.get("audio_file_path").split("/")[-1]
+        # audio_file = data.get("audio_file_path").split("/")[-1]
+        audio_file = data.get("audio_file_path").split("/")[-1].split(".")[0]
 
         print(annotation_table)
         table = pd.DataFrame(annotation_table)
@@ -53,7 +33,7 @@ def save_annotations(request):
         # save annotations to database:
         for index, row in table.iterrows():
             AudioAnnotation.objects.create(
-                audio_file=AudioFile.objects.get(file=audio_file),
+                audio_file=AudioFile.objects.get(id=audio_file),
                 start_time=row["start_time"],
                 end_time=row["end_time"],
                 annotation=row["label"],
@@ -155,5 +135,26 @@ class AudioAnnotationsView(TemplateView):
         return context
 
     # this a post only view:
+    def post(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
+    
+
+
+class AnnotateAudioFileView(TemplateView):
+    template_name = "annotate.html"
+
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        # get the audio file id:
+        audio_file_id = self.request.POST.get("audio_file")
+        print(audio_file_id)
+        audio_file = AudioFile.objects.get(id=audio_file_id)
+        context["audio_file"] = audio_file
+        context["audio_file_path"] = audio_file.file.url
+        labels = ["laugh", "crowd", "other"]
+        context["labels"] = labels
+        return context
+    
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
