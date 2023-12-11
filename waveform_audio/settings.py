@@ -41,9 +41,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    "rest_framework",
+    'crispy_forms',
+    "crispy_tailwind",
+
+
     "waveform_audio",
     "api",
-    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -59,6 +64,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "waveform_audio.urls"
+# CRISPY_TEMPLATE_PACK = 'uni_form'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
+
 
 print(BASE_DIR)
 SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
