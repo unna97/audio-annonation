@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load crispy_forms_tags %}
 
 <html>
 <head>
@@ -8,11 +9,17 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 </head>
+
 <body>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload</button>
-    </form>
-</body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Upload Audio</h2>
+                    {% crispy form %}
+            </div>
+        </div>
+    </div>
+
+
+
 </html>
