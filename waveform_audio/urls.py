@@ -27,7 +27,7 @@ urlpatterns = [
     path("annotate/", views.AnnotateAudioFileView.as_view(), name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
     path("upload/", views.UploadAudioFileView.as_view(), name="upload"),
-    path("clean_database/", views.AudioAnnotationsView.as_view(), name="clean_database"),
+    path("clean_database/", views.AudioAnnotationsTableView.as_view(), name="clean_database"),
     # API urls:
     path("api/", include(("api.urls", "api")), name="api"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

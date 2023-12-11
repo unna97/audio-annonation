@@ -230,6 +230,7 @@ function saveAnnotationsXHR() {
     }
 
     console.log(annotationTable);
+    console.log(audio_file_id);
 
     console.log(audio_file_path);
     // Send the annotation table data to Django
@@ -240,7 +241,8 @@ function saveAnnotationsXHR() {
     var requestData = {
         "annotation_table": JSON.stringify(annotationTable),
         "csrfmiddlewaretoken": csrfToken,
-        "audio_file_path": audio_file_path
+        "audio_file_path": audio_file_path,
+        "audio_file_id": audio_file_id
     };
 
     var xhr = new XMLHttpRequest();
@@ -278,7 +280,9 @@ function save_annotationsFetch(){
     requestData = {
         "annotation_table": JSON.stringify(annotationTable),
         "csrfmiddlewaretoken": csrfToken,
-        "audio_file_path": audio_file_path   
+        "audio_file_path": audio_file_path,
+        "audio_file": audio_file,
+        "audio_id": audio_id,
     }
 
     fetch('/save_annotations/', {

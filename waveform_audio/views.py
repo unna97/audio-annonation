@@ -21,19 +21,17 @@ def save_annotations(request):
         data = json.loads(request.body)
         annotation_table = json.loads(data.get("annotation_table"))
         # audio_file = data.get("audio_file_path").split("/")[-1]
-        audio_file = data.get("audio_file_path").split("/")[-1].split(".")[0]
-
+        audio_id = data.get("audio_id")
         print(annotation_table)
         table = pd.DataFrame(annotation_table)
         print(table)
-        print(audio_file)
         # get delta time:
         table["start_time"] = pd.to_datetime(table["start_time"], unit="s").dt.time
         table["end_time"] = pd.to_datetime(table["end_time"], unit="s").dt.time
         # save annotations to database:
         for index, row in table.iterrows():
             AudioAnnotation.objects.create(
-                audio_file=AudioFile.objects.get(id=audio_file),
+                audio_file=AudioFile.objects.get(id=audio_id),
                 start_time=row["start_time"],
                 end_time=row["end_time"],
                 annotation=row["label"],
@@ -91,14 +89,14 @@ class UploadAudioFileView(FormView):
 
 # show save annotations for the selected audio file:
 @method_decorator(require_http_methods(["POST"]), name="dispatch")
-class AudioAnnotationsView(TemplateView):
+class AudioAnnotationsTableView(TemplateView):
     template_name = "annotations_dashboard.html"
     # this will be called by a POST request i.e when the user clicks on the button:
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         # get the audio file id:
-        audio_file_id = self.request.POST.get("audio_file")
+        audio_file_id = self.request.POST.get("audio_id")
         print(audio_file_id)
 
         #TODO: Use API to get the annotations
