@@ -55,6 +55,7 @@
         <form method="post" action="{% url 'clean_database' %}">
             {% csrf_token %}
             <input type="text" name="audio_file" value="{{ audio_file }}" readonly>
+            <input type="hidden" name="audio_id" value="{{ audio_file.id }}" readonly>
             <button type="submit">Clean Database</button>
         </form>
     </div>
