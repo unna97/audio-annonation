@@ -95,7 +95,7 @@ then
   echo "Poetry is already installed 🟢"
 else
   echo "Installing Poetry 🧙‍♂️"
-  curl -sSL https://install.python-poetry.org | python3 -
+  curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.1 python3 -
 fi
 
 # Add Poetry to the path in the current user's .bashrc
