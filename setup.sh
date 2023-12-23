@@ -280,5 +280,5 @@ else
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   
   # Verify that the Docker Engine installation is successful by running the hello-world image
-  sudo docker run -rm hello-world
+  sudo docker run --rm hello-world
 fi
