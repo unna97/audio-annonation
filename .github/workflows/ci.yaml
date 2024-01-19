@@ -11,7 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: python:3.10-buster
+    container: python:3.11-buster
 
     steps:
       - name: Checkout
