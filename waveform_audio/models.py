@@ -35,6 +35,7 @@ class AudioAnnotation(models.Model):
     )
     # user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         ordering = ["start_time", "end_time"]
         db_table = "audio_annotation"

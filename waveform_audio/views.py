@@ -13,8 +13,9 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.urls import reverse
 
-from .models import AudioFile, AudioAnnotation
-from .forms import AudioFileForm
+
+from waveform_audio.models import AudioFile, AudioAnnotation
+from waveform_audio.forms import AudioFileForm
 
 
 @csrf_exempt
