@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views
+
+from api import views
 
 urlpatterns = [
     path("audio-files/", views.AudioFileListAPIView.as_view(), name="audio-file-list"),
