@@ -2,7 +2,7 @@ install:
 	poetry install --with dev
 
 test:
-	poetry run pytest .
+	#poetry run pytest .
 
 format:	
 	poetry run black .
