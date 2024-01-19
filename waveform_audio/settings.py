@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-import psycopg2 as pg
+
+# import psycopg2 as pg
 
 # configs imports
 from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
@@ -41,12 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
     "rest_framework",
-    'crispy_forms',
+    "crispy_forms",
     "crispy_tailwind",
-
-
     "waveform_audio",
     "api",
 ]
@@ -60,7 +58,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
 ]
 
 ROOT_URLCONF = "waveform_audio.urls"
@@ -94,7 +91,6 @@ TEMPLATES = [
 # Add static files:
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "waveform_audio/static"),
-    
 ]
 # the static url to use when referring to static files located in STATIC_ROOT:
 STATIC_URL = "/static/"
@@ -122,7 +118,8 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation"
+        + ".UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

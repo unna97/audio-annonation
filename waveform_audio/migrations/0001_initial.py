@@ -8,35 +8,55 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='AudioFile',
+            name="AudioFile",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('file', models.FileField(upload_to='audio/')),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("file", models.FileField(upload_to="audio/")),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'db_table': 'audio_file',
-                'ordering': ['timestamp'],
+                "db_table": "audio_file",
+                "ordering": ["timestamp"],
             },
         ),
         migrations.CreateModel(
-            name='AudioAnnotation',
+            name="AudioAnnotation",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('start_time', models.TimeField()),
-                ('end_time', models.TimeField()),
-                ('annotation', models.CharField(choices=[('speech', 'Speech'), ('music', 'Music'), ('noise', 'Noise'), ('laughter', 'Laughter'), ('other', 'Other'), ('unknown', 'Unknown')], default='unknown', max_length=10)),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('audio_file', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotations', to='waveform_audio.audiofile')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("start_time", models.TimeField()),
+                ("end_time", models.TimeField()),
+                (
+                    "annotation",
+                    models.CharField(
+                        choices=[
+                            ("speech", "Speech"),
+                            ("music", "Music"),
+                            ("noise", "Noise"),
+                            ("laughter", "Laughter"),
+                            ("other", "Other"),
+                            ("unknown", "Unknown"),
+                        ],
+                        default="unknown",
+                        max_length=10,
+                    ),
+                ),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                (
+                    "audio_file",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="annotations",
+                        to="waveform_audio.audiofile",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'audio_annotation',
-                'ordering': ['start_time', 'end_time'],
+                "db_table": "audio_annotation",
+                "ordering": ["start_time", "end_time"],
             },
         ),
     ]
