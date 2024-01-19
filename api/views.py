@@ -1,8 +1,10 @@
-from .serializers import AudioFileSerializer, AudioAnnotationSerializer
-from rest_framework import generics, status
-from waveform_audio.models import AudioFile, AudioAnnotation
-from rest_framework.response import Response
 import os
+from rest_framework import generics, status
+from rest_framework.response import Response
+
+
+from api.serializers import AudioFileSerializer, AudioAnnotationSerializer
+from waveform_audio.models import AudioFile, AudioAnnotation
 
 
 class AudioFileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
