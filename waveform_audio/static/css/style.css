@@ -17,7 +17,8 @@ h1 {
 h2 {
   background-color: #ccbb6c;
 }
-button {
+
+button, input[type=submit] {
   padding: 10px 20px;
   background-color: #fd883d;
   color: #fff;
@@ -26,7 +27,7 @@ button {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-button:hover {
+button:hover, input[type=submit]:hover {
   background-color: #fdaa7b;
 }
 /* style the select dropdown */
