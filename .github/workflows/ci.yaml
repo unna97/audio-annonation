@@ -1,0 +1,42 @@
+name: CI
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  POETRY_VERSION: 1.5.1
+  POETRY_VIRTUALENVS_IN_PROJECT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: python:3.11-buster
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install System Dependencies
+        run: |
+          apt update && apt upgrade -y
+          apt install -y make curl
+
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry==${{ env.POETRY_VERSION }}
+          poetry --version
+
+      - name: Install Python Dependencies with Poetry
+        run: |
+          poetry install --with dev --no-interaction
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
+
+      - name: Deploy
+        run: make deploy

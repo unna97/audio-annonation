@@ -1,19 +1,22 @@
 from typing import Any
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+import requests
 import json
-from django.views.decorators.csrf import csrf_exempt
+
 import pandas as pd
 
-from .models import AudioFile, AudioAnnotation
-
+# from django.shortcuts import render
+from django.http import JsonResponse  # HttpResponse,
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
-from .forms import AudioFileForm
 from django.urls import reverse
-import requests
+
+
+from waveform_audio.models import AudioFile, AudioAnnotation
+from waveform_audio.forms import AudioFileForm
+
 
 @csrf_exempt
 def save_annotations(request):
@@ -87,6 +90,7 @@ class UploadAudioFileView(FormView):
 
         return super().form_invalid(form)
 
+
 # show save annotations for the selected audio file:
 @method_decorator(require_http_methods(["POST"]), name="dispatch")
 class AudioAnnotationsTableView(TemplateView):
@@ -99,8 +103,8 @@ class AudioAnnotationsTableView(TemplateView):
         audio_file_id = self.request.POST.get("audio_id")
         print(audio_file_id)
 
-        #TODO: Use API to get the annotations
-         # get annotations from database by id:
+        # TODO: Use API to get the annotations
+        # get annotations from database by id:
         annotations = AudioAnnotation.objects.filter(audio_file__id=audio_file_id)
 
         annotations = pd.DataFrame(
@@ -117,9 +121,9 @@ class AudioAnnotationsTableView(TemplateView):
         )
         print(annotations)
         if annotations.empty:
-           message = "No annotations found"
-           context["message"] = message
-           return context
+            message = "No annotations found"
+            context["message"] = message
+            return context
 
         annotations["start_time"] = annotations["start_time"].apply(
             lambda x: x.strftime("%H:%M:%S")
@@ -128,19 +132,16 @@ class AudioAnnotationsTableView(TemplateView):
             lambda x: x.strftime("%H:%M:%S")
         )
         context = {"annotations": annotations.to_dict(orient="records")}
-        
-       
+
         return context
 
     # this a post only view:
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
-    
 
 
 class AnnotateAudioFileView(TemplateView):
     template_name = "annotate.html"
-
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -153,6 +154,6 @@ class AnnotateAudioFileView(TemplateView):
         labels = ["laugh", "crowd", "other"]
         context["labels"] = labels
         return context
-    
+
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
