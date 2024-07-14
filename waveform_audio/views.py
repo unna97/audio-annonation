@@ -1,8 +1,3 @@
-from ast import Sub
-from email import errors
-from math import e
-from os import error
-from re import template
 from typing import Any
 import requests
 import json
@@ -10,7 +5,7 @@ import json
 import pandas as pd
 
 # from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse  # HttpResponse,
+from django.http import JsonResponse  # HttpResponse,
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
