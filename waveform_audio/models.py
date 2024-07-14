@@ -12,6 +12,8 @@ class AudioFile(models.Model):
     class Meta:
         ordering = ["timestamp"]
         db_table = "audio_file"
+        # make sure the file is unique:
+        unique_together = ["file"]
 
 
 class AudioAnnotation(models.Model):
@@ -39,3 +41,21 @@ class AudioAnnotation(models.Model):
     class Meta:
         ordering = ["start_time", "end_time"]
         db_table = "audio_annotation"
+
+
+class Subtitle(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    audio_file = models.ForeignKey(
+        AudioFile, on_delete=models.CASCADE, related_name="subtitles"
+    )
+    start_time = models.DurationField()
+    end_time = models.DurationField()
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["start_time", "end_time"]
+        db_table = "subtitle"
+        # make sure the subtitle is unique:
+        unique_together = ["audio_file", "start_time", "end_time"]
