@@ -30,6 +30,9 @@ urlpatterns = [
     path("annotate/", views.AnnotateAudioFileView.as_view(), name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
     path("upload/", views.UploadAudioFileView.as_view(), name="upload"),
+
+    path('upload_audio_subs/', views.UploadAudioAndSubtitleView.as_view(), name='upload_audio_subtitle'),
+
     path(
         "clean_database/",
         views.AudioAnnotationsTableView.as_view(),
