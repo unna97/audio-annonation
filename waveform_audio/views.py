@@ -63,51 +63,59 @@ class AudioFileAvailableView(TemplateView):
         context["audio_files"] = audio_files
 
         return context
-    
+
 
 class UploadAudioAndSubtitleView(FormView):
-    template_name = 'upload_audio_subtitle.html'
+    template_name = "upload_audio_subtitle.html"
     audio_form_class = AudioModelFileForm
     subtitle_form_class = SubtitleFileForm
-    success_url = '/'
+    success_url = "/"
 
     def get(self, request, *args, **kwargs):
         audio_form = self.audio_form_class()
         subtitle_form = self.subtitle_form_class()
-        return render(request, self.template_name, {'audio_form': audio_form, 'subtitle_form': subtitle_form})
+        return render(
+            request,
+            self.template_name,
+            {"audio_form": audio_form, "subtitle_form": subtitle_form},
+        )
 
     def post(self, request, *args, **kwargs):
         audio_form = self.audio_form_class(request.POST, request.FILES)
         subtitle_form = self.subtitle_form_class(request.POST, request.FILES)
-        
+
         if audio_form.is_valid():
             audio_file_instance = audio_form.save()
             # if the file is already in the database:
             if AudioFile.objects.filter(file=audio_file_instance.file).exists():
-                audio_file_instance = AudioFile.objects.get(file=audio_file_instance.file)
-            
+                audio_file_instance = AudioFile.objects.get(
+                    file=audio_file_instance.file
+                )
+
             if subtitle_form.is_valid():
-                subtitle_file = request.FILES['subtitle_file']
+                subtitle_file = request.FILES["subtitle_file"]
                 subtitle_texts = utils.process_subtitle_file(subtitle_file)
-                subtitle_data = self.save_subtitle_data(audio_file_instance, subtitle_texts)
+                subtitle_data = self.save_subtitle_data(
+                    audio_file_instance, subtitle_texts
+                )
         else:
             # show the errors in the form:
             print(audio_form.errors)
             print(subtitle_form.errors)
             errors = audio_form.errors | subtitle_form.errors
-            return JsonResponse({"message": "","errors":errors})
-        
+            return JsonResponse({"message": "", "errors": errors})
+
         return redirect(self.success_url)
 
     def save_subtitle_data(self, audio_file_instance, subtitle_texts):
-       # save the subtitle data to the database:
-        subtitle_data = [ {**s, "audio_file": audio_file_instance} for s in subtitle_texts ]
-        #TODO: Figure out how to do bulk create
-        subtitle_data_obj = [ Subtitle.objects.create(**s) for s in subtitle_data ]
+        # save the subtitle data to the database:
+        subtitle_data = [
+            {**s, "audio_file": audio_file_instance} for s in subtitle_texts
+        ]
+        # TODO: Figure out how to do bulk create
+        subtitle_data_obj = [Subtitle.objects.create(**s) for s in subtitle_data]
 
         return subtitle_data_obj
-    
-
 
 
 class UploadAudioFileView(FormView):

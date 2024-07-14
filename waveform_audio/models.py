@@ -44,7 +44,7 @@ class AudioAnnotation(models.Model):
 
 
 class Subtitle(models.Model):
-    
+
     id = models.AutoField(primary_key=True)
     audio_file = models.ForeignKey(
         AudioFile, on_delete=models.CASCADE, related_name="subtitles"
