@@ -25,19 +25,21 @@ class AudioFileForm(forms.Form):
         helper.inputs.append(Submit("submit", "Submit"))
         return helper
 
+
 class AudioModelFileForm(forms.ModelForm):
     class Meta:
         model = AudioFile
-        fields = ['file']
+        fields = ["file"]
         labels = {
-            'audio_file': 'Select a file',
+            "audio_file": "Select a file",
         }
         help_texts = {
-            'audio_file': 'insert an audio file',
+            "audio_file": "insert an audio file",
         }
         widgets = {
-            'audio_file': forms.FileInput(attrs={'accept': 'audio/*'}),
+            "audio_file": forms.FileInput(attrs={"accept": "audio/*"}),
         }
+
 
 class SubtitleFileForm(forms.Form):
     subtitle_file = forms.FileField(
@@ -52,5 +54,3 @@ class SubtitleFileForm(forms.Form):
         helper.form_method = "POST"
         helper.inputs.append(Submit("submit", "Submit"))
         return helper
-    
-    
