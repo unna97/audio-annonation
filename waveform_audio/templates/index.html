@@ -29,7 +29,7 @@
         </div>
      </div>
 
-    <form method="post" action="{% url 'upload' %}">
+    <form method="get" action="{% url 'upload' %}">
         {% csrf_token %}
         <button type="submit">Upload New File</button>
     </form>

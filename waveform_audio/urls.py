@@ -29,11 +29,10 @@ urlpatterns = [
     path("", views.AudioFileAvailableView.as_view(), name="index"),
     path("annotate/", views.AnnotateAudioFileView.as_view(), name="annotate"),
     path("save_annotations/", views.save_annotations, name="save_annotations"),
-    path("upload/", views.UploadAudioFileView.as_view(), name="upload"),
     path(
-        "upload_audio_subs/",
+        "upload/",
         views.UploadAudioAndSubtitleView.as_view(),
-        name="upload_audio_subtitle",
+        name="upload",
     ),
     path(
         "clean_database/",

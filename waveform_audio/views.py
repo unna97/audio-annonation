@@ -61,10 +61,10 @@ class AudioFileAvailableView(TemplateView):
 
 
 class UploadAudioAndSubtitleView(FormView):
-    template_name = "upload_audio_subtitle.html"
+    template_name = "upload.html"
     audio_form_class = AudioModelFileForm
     subtitle_form_class = SubtitleFileForm
-    success_url = "/"
+    success_url = "/api/audio-files"
 
     def get(self, request, *args, **kwargs):
         audio_form = self.audio_form_class()
@@ -112,38 +112,6 @@ class UploadAudioAndSubtitleView(FormView):
 
         return subtitle_data_obj
 
-
-class UploadAudioFileView(FormView):
-    template_name = "upload.html"
-    form_class = AudioFileForm
-    # Success calls the api view of the AudioFileListAPIView
-    success_url = "/api/audio-files/"
-    # success_url = reverse('api:audio-file-upload')
-
-    def form_valid(self, form):
-        # save the file to the database:
-        audio_file = form.cleaned_data["audio_file"]
-        audio_file_name = audio_file.name
-
-        # Prepare the API endpoint URL
-        if form.is_valid():
-            api_url = reverse("api:audio-file-upload")
-            api_url_with_scheme = self.request.build_absolute_uri(api_url)
-
-            file = {"file": (audio_file_name, audio_file)}
-            response = requests.post(api_url_with_scheme, files=file)
-            if response.status_code == 201:
-                return super().form_valid(form)
-            return self.form_invalid(form, api_response=response.json())
-
-        return super().form_invalid(form)
-
-    def form_invalid(self, form, api_response=None):
-        # get a popup message on the html page that the file is not valid:
-        if api_response not in (None, {}):
-            form.add_error(None, api_response)
-
-        return super().form_invalid(form)
 
 
 # show save annotations for the selected audio file:
