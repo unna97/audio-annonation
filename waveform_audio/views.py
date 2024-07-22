@@ -1,5 +1,4 @@
 from typing import Any
-import requests
 import json
 
 import pandas as pd
@@ -11,12 +10,11 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
-from django.urls import reverse
 from django.shortcuts import redirect, render
 
 
 from waveform_audio.models import AudioFile, AudioAnnotation, Subtitle
-from waveform_audio.forms import AudioFileForm, AudioModelFileForm, SubtitleFileForm
+from waveform_audio.forms import AudioModelFileForm, SubtitleFileForm
 from waveform_audio import utils
 
 
