@@ -88,11 +88,9 @@ class UploadAudioAndSubtitleView(FormView):
             if subtitle_form.is_valid():
                 subtitle_file = request.FILES["subtitle_file"]
                 subtitle_texts = utils.process_subtitle_file(subtitle_file)
-                #TODO: The returned subtitles should be used to inform success
-                self.save_subtitle_data(
-                    audio_file_instance, subtitle_texts
-                )
-                
+                # TODO: The returned subtitles should be used to inform success
+                self.save_subtitle_data(audio_file_instance, subtitle_texts)
+
         else:
             # show the errors in the form:
             print(audio_form.errors)
