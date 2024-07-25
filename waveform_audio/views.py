@@ -171,8 +171,13 @@ class AnnotateAudioFileView(TemplateView):
         audio_file = AudioFile.objects.get(id=audio_file_id)
         context["audio_file"] = audio_file
         context["audio_file_path"] = audio_file.file.url
+        # allow these to be set by the user:
         labels = ["laugh", "crowd", "other"]
         context["labels"] = labels
+
+        # get the subtitle data for the audio file:
+        subtitles = Subtitle.objects.filter(audio_file__id=audio_file_id)
+        context["subtitles"] = subtitles
         return context
 
     def post(self, request, *args, **kwargs):

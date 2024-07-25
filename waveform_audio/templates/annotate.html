@@ -50,7 +50,17 @@
         </div>
     </div>
 
-    <div id="subtitleContainer"></div>
+    <div id="subtitleContainer">
+        <h2>Subtitles</h2>
+        {% for subtitle in subtitles %}
+         <!-- <p>{{ subtitle.start_time }}-{{ subtitle.end_time }}: -->
+            {% if subtitle.content|length > 20 %} 
+                <span class="highlight_text">{{ subtitle.content }}</span>
+            {% else %}
+                <span>{{ subtitle.content }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
     <div id="databaseTable">
         <form method="post" action="{% url 'clean_database' %}">
             {% csrf_token %}
