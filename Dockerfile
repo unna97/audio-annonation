@@ -1,4 +1,6 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:latest AS base
+
+LABEL maintainer=Unnati
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -15,6 +17,19 @@ SHELL ["conda", "run", "-n", "comedy-project-docker", "/bin/bash", "-c"]
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
+
+
+# Migration stage:
+FROM base AS migrate
+COPY . .
+# echo:
+RUN echo "running migrations" && conda run -n comedy-project-docker python manage.py migrate && \
+echo "migrations done, running collectstatic" && conda run -n comedy-project-docker python manage.py collectstatic --noinput
+
+
+
+# Application stage:
+FROM base AS app
 
 COPY . .
 
