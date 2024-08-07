@@ -19,6 +19,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
+# Entrypoint stage (for ensuring db exists)
+COPY db-entrypoint.sh ./db-entrypoint.sh
+COPY web-entrypoint.sh ./web-entrypoint.sh
+RUN chmod +x ./db-entrypoint.sh ./web-entrypoint.sh
+ENTRYPOINT ["./web-entrypoint.sh"]
+
+
 # Migration stage:
 FROM base AS migrate
 COPY . .
