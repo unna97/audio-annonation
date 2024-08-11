@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
-# import psycopg2 as pg
 
 # configs imports
 from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
@@ -158,10 +157,9 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = "/media/"  # this is the url to the media folder
-# MEDIA_ROOT = os.path.join(
-#     BASE_DIR, "waveform_audio", "static", "media"
-# )  # this is the path to the media folder
-MEDIA_ROOT = "/audio-annonation/media"
+
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR,"waveform_audio", "static", "media"))
+
 
 # Static root:
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
