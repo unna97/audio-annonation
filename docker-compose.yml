@@ -8,15 +8,15 @@ services:
     command: conda run --no-capture-output -n comedy-project-docker python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/audio-annonation
-      - D:/comedy/media:/audio-annonation/media
+      - ${MEDIA_ROOT}:/comedy/media
     ports:
       - "8000:8000"
-
+    environment:
+      - MEDIA_ROOT=/comedy/media
     depends_on:
       db:
         condition: service_healthy
-      # vector_db:
-      #   condition: service_started
+
     env_file:
       - .env
     healthcheck:
@@ -62,4 +62,3 @@ services:
 
 volumes:
   postgres_data:
-  # vector_data:

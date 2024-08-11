@@ -41,4 +41,7 @@ urlpatterns = [
     ),
     # API urls:
     path("api/", include(("api.urls", "api")), name="api"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
