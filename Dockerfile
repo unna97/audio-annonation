@@ -25,16 +25,6 @@ COPY web-entrypoint.sh ./web-entrypoint.sh
 RUN chmod +x ./db-entrypoint.sh ./web-entrypoint.sh
 ENTRYPOINT ["./web-entrypoint.sh"]
 
-
-# Migration stage:
-FROM base AS migrate
-COPY . .
-# echo:
-RUN echo "running migrations" && conda run -n comedy-project-docker python manage.py migrate && \
-echo "migrations done, running collectstatic" && conda run -n comedy-project-docker python manage.py collectstatic --noinput
-
-
-
 # Application stage:
 FROM base AS app
 
