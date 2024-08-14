@@ -1,20 +1,24 @@
-from tabnanny import verbose
 from django.db import models
+from .utils import file_hash
 
 
 class AudioFile(models.Model):
     id = models.AutoField(primary_key=True)
-    file = models.FileField(upload_to="audio/")
+    file = models.FileField(upload_to="audio/", unique=True)
+    file_hash = models.CharField(unique=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.file)
 
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only on creation
+            self.file_hash = file_hash(self.file)
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ["timestamp"]
         db_table = "audio_file"
-        # make sure the file is unique:
-        unique_together = ["file"]
         verbose_name = "Audio File"
         verbose_name_plural = "Audio Files"
 
@@ -46,7 +50,6 @@ class AudioAnnotation(models.Model):
         db_table = "audio_annotation"
         verbose_name = "Audio Annotation"
         verbose_name_plural = "Audio Annotations"
-
 
 
 class Subtitle(models.Model):
