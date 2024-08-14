@@ -168,3 +168,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Whitenoise settings
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Test settings:
+TEST_MEDIA_ROOT = os.path.join(BASE_DIR, "waveform_audio", "fixtures")
