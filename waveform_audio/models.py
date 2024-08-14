@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from django.db import models
 
 
@@ -14,6 +15,8 @@ class AudioFile(models.Model):
         db_table = "audio_file"
         # make sure the file is unique:
         unique_together = ["file"]
+        verbose_name = "Audio File"
+        verbose_name_plural = "Audio Files"
 
 
 class AudioAnnotation(models.Model):
@@ -41,6 +44,9 @@ class AudioAnnotation(models.Model):
     class Meta:
         ordering = ["start_time", "end_time"]
         db_table = "audio_annotation"
+        verbose_name = "Audio Annotation"
+        verbose_name_plural = "Audio Annotations"
+
 
 
 class Subtitle(models.Model):
@@ -59,3 +65,5 @@ class Subtitle(models.Model):
         db_table = "subtitle"
         # make sure the subtitle is unique:
         unique_together = ["audio_file", "start_time", "end_time"]
+        verbose_name = "Subtitle"
+        verbose_name_plural = "Subtitles"
