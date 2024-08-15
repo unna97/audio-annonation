@@ -23,7 +23,7 @@ def process_subtitle_file(subtitle_file) -> List[Dict[str, Any]]:
 
 def file_hash(file):
     """Generate a hash for the file content."""
-    md5 = hashlib.md5()
+    sha256 = hashlib.sha256()
     for chunk in file.chunks():
-        md5.update(chunk)
-    return md5.hexdigest()
+        sha256.update(chunk)
+    return sha256.hexdigest()
