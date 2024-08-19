@@ -1,15 +1,11 @@
-from email.mime import audio
-from hashlib import md5
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from waveform_audio.models import AudioFile
 from django.db.utils import IntegrityError
 
-from waveform_audio import utils
-
-
 class AudioFileModelTest(TestCase):
     def setUp(self):
+
         self.audio_file = SimpleUploadedFile(
             "test_audio.wav", content_type="audio/wav", content=b"test"
         )  # TODO automate read from file
