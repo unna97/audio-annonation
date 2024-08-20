@@ -1,41 +1,68 @@
-from django.test import TestCase
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
-from waveform_audio.models import AudioFile
+from waveform_audio.models import AudioAnnotation, AudioFile
 from django.db.utils import IntegrityError
+import os
+import hashlib
 
-class AudioFileModelTest(TestCase):
-    def setUp(self):
 
-        self.audio_file = SimpleUploadedFile(
-            "test_audio.wav", content_type="audio/wav", content=b"test"
-        )  # TODO automate read from file
+@pytest.mark.django_db
+class TestAudioFileModel:
+    def test_create_audio_file(self, audio_file_1):
+        audio = AudioFile.objects.create(file=audio_file_1)
+        assert isinstance(audio, AudioFile)
+        # assert audio.__str__() == os.path.basename(audio.file.name)
+        assert audio.file.name.endswith(".wav")
+        assert os.path.exists(audio.file.path)
 
-        mp3_content = b"\xFF\xFB\x90\x44\x00\x00\x00\x00\x00\x00\x00\x00"  # Minimal valid MP3 header
+    def test_unique_together_constraint(self, audio_file_1):
+        AudioFile.objects.create(file=audio_file_1)
+        with pytest.raises(IntegrityError):
+            AudioFile.objects.create(file=audio_file_1)
 
-        self.audio_file_2 = SimpleUploadedFile(
-            "test_audio_2.mp3", content=mp3_content, content_type="audio/mpeg"
-        )
+    def test_file_hash(self, audio_file_1):
+        audio = AudioFile.objects.create(file=audio_file_1)
+        assert audio.file_hash
+        # expected_hash = hashlib.sha256(audio_file_1.read()).hexdigest()
+        # audio_file_1.seek(0)  # Reset file pointer
+        # assert audio.file_hash == expected_hash
 
-    def test_create_audio_file(self):
-        audio = AudioFile.objects.create(file=self.audio_file)
-        self.assertTrue(isinstance(audio, AudioFile))
-        self.assertEqual(audio.__str__(), str(audio.file))
-
-    def test_unique_together_constraint(self):
-        AudioFile.objects.create(file=self.audio_file)
-        with self.assertRaises(IntegrityError):
-            AudioFile.objects.create(file=self.audio_file)
-
-    def test_ordering(self):
-
-        AudioFile.objects.create(file=self.audio_file)
-        AudioFile.objects.create(file=self.audio_file_2)
+    def test_file_ordering(self, audio_file_1, audio_file_2):
+        audio1 = AudioFile.objects.create(file=audio_file_1)
+        audio2 = AudioFile.objects.create(file=audio_file_2)
+        assert audio1.timestamp < audio2.timestamp
         audio_files = AudioFile.objects.all()
-        self.assertEqual(
-            audio_files[0].timestamp, audio_files.earliest("timestamp").timestamp
-        )
+        assert audio_files[0].timestamp == audio_files.earliest("timestamp").timestamp
 
-    def test_file_hash(self):
-        audio = AudioFile.objects.create(file=self.audio_file)
-        # check if file_hash is created:
-        self.assertTrue(audio.file_hash)
+
+@pytest.mark.django_db
+class TestAudioAnnotationModel:
+    def test_create_audio_annotation(self, audio_file_1):
+        audio = AudioFile.objects.get_or_create(file=audio_file_1)
+        annonation = AudioAnnotation.objects.create(
+            audio_file=audio[0],
+            start_time="00:00:00",
+            end_time="00:00:01",
+            annotation="speech",
+        )
+        assert isinstance(annonation, AudioAnnotation)
+        assert annonation.annotation == "speech"
+        assert annonation.start_time == "00:00:00"
+        assert annonation.end_time == "00:00:01"
+        assert annonation.audio_file == audio[0]
+
+    def test_unique_together_constraint(self, audio_file_1):
+        audio = AudioFile.objects.get_or_create(file=audio_file_1)
+        AudioAnnotation.objects.create(
+            audio_file=audio[0],
+            start_time="00:00:00",
+            end_time="00:00:01",
+            annotation="speech",
+        )
+        with pytest.raises(IntegrityError):
+            AudioAnnotation.objects.create(
+                audio_file=audio[0],
+                start_time="00:00:00",
+                end_time="00:00:01",
+                annotation="speech",
+            )
