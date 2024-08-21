@@ -1,0 +1,16 @@
+1
+00:00:00,480 --> 00:00:03,358
+Fourscore and seven years ago, our fathers brought
+
+2
+00:00:03,358 --> 00:00:06,038
+forth on this continent a new nation, conceived
+
+3
+00:00:06,038 --> 00:00:08,318
+in liberty and dedicated to the proposition that
+
+4
+00:00:08,318 --> 00:00:09,710
+all men are created equal.
+

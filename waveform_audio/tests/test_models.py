@@ -23,9 +23,7 @@ class TestAudioFileModel:
     def test_file_hash(self, audio_file_1):
         audio = AudioFile.objects.create(file=audio_file_1)
         assert audio.file_hash
-        # expected_hash = hashlib.sha256(audio_file_1.read()).hexdigest()
-        # audio_file_1.seek(0)  # Reset file pointer
-        # assert audio.file_hash == expected_hash
+        # TODO: test the hash value
 
     def test_file_ordering(self, audio_file_1, audio_file_2):
         audio1 = AudioFile.objects.create(file=audio_file_1)

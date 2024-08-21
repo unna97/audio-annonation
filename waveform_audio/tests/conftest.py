@@ -46,3 +46,20 @@ def audio_file_2():
     return SimpleUploadedFile(
         "test_audio_2.mp3", content=content, content_type="audio/mpeg"
     )
+
+
+@pytest.fixture
+def subtitles_file_1():
+    content = read_fixture_file("test_subtitles.srt")
+    return SimpleUploadedFile(
+        "test_subtitles.srt", content=content, content_type="text/plain"
+    )
+
+
+# TODO: Add a speech audio and corresponding srt
+# @pytest.fixture
+# def subtitles_file_2():
+#     content = read_fixture_file("test_subtitles_2.srt")
+#     return SimpleUploadedFile(
+#         "test_subtitles_2.srt", content=content, content_type="text/plain"
+#     )
