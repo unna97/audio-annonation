@@ -37,7 +37,7 @@ def save_annotations(request):
                 audio_file=AudioFile.objects.get(id=audio_id),
                 start_time=row["start_time"],
                 end_time=row["end_time"],
-                annotation=row["label"],
+                content=row["label"],
             )
         # provide a popup message that annotations have been saved:
         return JsonResponse({"message": "Annotations have been saved"})
@@ -133,7 +133,7 @@ class AudioAnnotationsTableView(TemplateView):
                     "audio_file__file",
                     "start_time",
                     "end_time",
-                    "annotation",
+                    "content",
                     "timestamp",
                     "id",
                 )
@@ -145,12 +145,12 @@ class AudioAnnotationsTableView(TemplateView):
             context["message"] = message
             return context
 
-        annotations["start_time"] = annotations["start_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
-        annotations["end_time"] = annotations["end_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
+        annotations["start_time"] = annotations["start_time"]#.apply(
+        #     lambda x: x.strftime("%H:%M:%S")
+        # )
+        annotations["end_time"] = annotations["end_time"]#.apply(
+        #    lambda x: x.strftime("%H:%M:%S")
+        #)
         context = {"annotations": annotations.to_dict(orient="records")}
 
         return context
