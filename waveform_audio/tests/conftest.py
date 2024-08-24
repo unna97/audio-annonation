@@ -1,9 +1,9 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
-from django.conf import settings
 import os
 import shutil
+import datetime as dt
 
 
 @pytest.fixture(scope="session")
@@ -54,6 +54,82 @@ def subtitles_file_1():
     return SimpleUploadedFile(
         "test_subtitles.srt", content=content, content_type="text/plain"
     )
+
+
+@pytest.fixture
+def example_annotations():
+    return [
+        # String time format:
+        {"start_time": "00:00:00.089", "end_time": "00:00:05.78", "content": "music"},
+        {"start_time": "00:00:15", "end_time": "00:00:30", "content": "speech"},
+        # ISO format:
+        {
+            "start_time": dt.time(0, 0, 5),
+            "end_time": dt.time(0, 0, 10),
+            "content": "speech",
+        },
+        {
+            "start_time": dt.time(0, 0, 10, 100),
+            "end_time": dt.time(0, 0, 15, 200),
+            "content": "speech",
+        },
+        # Time delta format:
+        {
+            "start_time": dt.timedelta(seconds=10),
+            "end_time": dt.timedelta(seconds=15),
+            "content": "noise",
+        },
+        {
+            "start_time": dt.timedelta(seconds=15, milliseconds=100),
+            "end_time": dt.timedelta(seconds=20, milliseconds=200),
+            "content": "noise",
+        },
+    ]
+
+
+@pytest.fixture
+def stored_example_annotations():
+    return [
+        # String time format:
+        {
+            "start_time": dt.time(0, 0, 0, 89000),
+            "end_time": dt.time(0, 0, 5, 780000),
+            "content": "music",
+            "duration": dt.timedelta(seconds=5, microseconds=691000),
+        },
+        {
+            "start_time": dt.time(0, 0, 15),
+            "end_time": dt.time(0, 0, 30),
+            "content": "speech",
+            "duration": dt.timedelta(seconds=15),
+        },
+        # ISO format:
+        {
+            "start_time": dt.time(0, 0, 5),
+            "end_time": dt.time(0, 0, 10),
+            "content": "speech",
+            "duration": dt.timedelta(seconds=5),
+        },
+        {
+            "start_time": dt.time(0, 0, 10, 100),
+            "end_time": dt.time(0, 0, 15, 200),
+            "content": "speech",
+            "duration": dt.timedelta(seconds=5, microseconds=100),
+        },
+        # Time delta format (converted to time format):
+        {
+            "start_time": dt.time(0, 0, 10),
+            "end_time": dt.time(0, 0, 15),
+            "content": "noise",
+            "duration": dt.timedelta(seconds=5),
+        },
+        {
+            "start_time": dt.time(0, 0, 15, 100000),
+            "end_time": dt.time(0, 0, 20, 200000),
+            "content": "noise",
+            "duration": dt.timedelta(seconds=5, milliseconds=100),
+        },
+    ]
 
 
 # TODO: Add a speech audio and corresponding srt

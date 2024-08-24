@@ -11,8 +11,8 @@ from django.core import checks
 class TimeBoundLabelAbstract(models.Model):
 
     id = models.AutoField(primary_key=True)
-    start_time = models.DurationField()
-    end_time = models.DurationField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
     audio_file = models.ForeignKey("AudioFile", on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     content = None  # This will be set by the subclass
@@ -22,28 +22,43 @@ class TimeBoundLabelAbstract(models.Model):
         ordering = ["start_time", "end_time"]
 
     @staticmethod
-    def parse_time(time_str):
-        if isinstance(time_str, time):
-            return time_str
-        try:
-            return dt.datetime.strptime(time_str, "%H:%M:%S").time()
-        except ValueError:
-            raise ValidationError(f"Invalid time format: {time_str}. Use HH:MM:SS.")
+    def parse_time(time_value):
+        if isinstance(time_value, time):
+            return time_value
+        if isinstance(time_value, dt.timedelta):
+            time_value = str(time_value)
+            # check if the time value is in the format HH:MM:SS.%f, if not, add the missing parts with 0:
+            if "." not in time_value:
+                time_value += ".0"
+
+        if isinstance(time_value, str):
+            try:
+                return dt.datetime.strptime(time_value, "%H:%M:%S.%f").time()
+            except ValueError:
+                try:
+                    return dt.time.fromisoformat(time_value)
+                except ValueError:
+                    raise ValidationError(
+                        f"Invalid time format: {time_value}. Use HH:MM:SS.%f or ISO format or time delta."
+                    )
+        raise ValidationError(
+            f"Invalid time type: {type(time_value)}. Use string or time object."
+        )
 
     def clean(self):
-        self.start_time = self.parse_time(self.start_time)
-        self.end_time = self.parse_time(self.end_time)
         if self.start_time >= self.end_time:
             raise ValidationError(_("End time must be after start time."))
 
     def duration(self):
-        start_datetime = dt.datetime.combine(
-            dt.datetime.min, self.parse_time(self.start_time)
-        )
-        end_datetime = dt.datetime.combine(
-            dt.datetime.min, self.parse_time(self.end_time)
-        )
+        start_datetime = dt.datetime.combine(dt.datetime.min, self.start_time)
+        end_datetime = dt.datetime.combine(dt.datetime.min, self.end_time)
         return end_datetime - start_datetime
+
+    def save(self, *args, **kwargs):
+        self.start_time = self.parse_time(self.start_time)
+        self.end_time = self.parse_time(self.end_time)
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     @classmethod
     def check(cls, **kwargs):
@@ -89,8 +104,7 @@ class AudioAnnotation(TimeBoundLabelAbstract):
         max_length=255, help_text=_("Annotation label of the audio segment")
     )
 
-    class Meta:
-        ordering = ["start_time", "end_time"]
+    class Meta(TimeBoundLabelAbstract.Meta):
         db_table = "audio_annotation"
         # TODO: Add a Annotator model and field
         # make sure the annotation is unique:
@@ -108,8 +122,7 @@ class Subtitle(TimeBoundLabelAbstract):
 
     content = models.TextField(help_text=_("Subtitle content"))
     # language = models.CharField(max_length=255, default="en")
-    class Meta:
-        ordering = ["start_time", "end_time"]
+    class Meta(TimeBoundLabelAbstract.Meta):
         db_table = "subtitle"
         # make sure the subtitle is unique:
         unique_together = ["audio_file", "start_time", "end_time"]
