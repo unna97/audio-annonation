@@ -145,12 +145,12 @@ class AudioAnnotationsTableView(TemplateView):
             context["message"] = message
             return context
 
-        annotations["start_time"] = annotations["start_time"]#.apply(
+        annotations["start_time"] = annotations["start_time"]  # .apply(
         #     lambda x: x.strftime("%H:%M:%S")
         # )
-        annotations["end_time"] = annotations["end_time"]#.apply(
+        annotations["end_time"] = annotations["end_time"]  # .apply(
         #    lambda x: x.strftime("%H:%M:%S")
-        #)
+        # )
         context = {"annotations": annotations.to_dict(orient="records")}
 
         return context

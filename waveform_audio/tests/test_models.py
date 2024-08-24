@@ -32,16 +32,16 @@ class TestAudioFileModel:
         audio_files = AudioFile.objects.all()
         assert audio_files[0].timestamp == audio_files.earliest("timestamp").timestamp
 
+
 @pytest.mark.django_db
 class TestAudioAnnotationModel:
-
     def test_str_representation(self, audio_file_1):
         audio = AudioFile.objects.get_or_create(file=audio_file_1)[0]
         annotation = AudioAnnotation.objects.create(
             audio_file=audio,
             start_time="00:00:00",
             end_time="00:00:01",
-            content="speech"
+            content="speech",
         )
         expected_str = f"{audio} - speech (00:00:00 to 00:00:01)"
         assert str(annotation) == expected_str
@@ -52,7 +52,7 @@ class TestAudioAnnotationModel:
             audio_file=audio,
             start_time="00:00:00",
             end_time="00:00:01",
-            content="speech"
+            content="speech",
         )
         annotation.clean()  # Should not raise an exception
 
@@ -62,7 +62,7 @@ class TestAudioAnnotationModel:
             audio_file=audio,
             start_time="00:00:01",
             end_time="00:00:00",
-            content="speech"
+            content="speech",
         )
         with pytest.raises(ValidationError):
             annotation.clean()
@@ -73,7 +73,7 @@ class TestAudioAnnotationModel:
             audio_file=audio,
             start_time="00:00:00",
             end_time="00:00:10",
-            content="speech"
+            content="speech",
         )
         expected_duration = dt.timedelta(seconds=10)
         assert annotation.duration() == expected_duration
@@ -84,13 +84,13 @@ class TestAudioAnnotationModel:
             audio_file=audio,
             start_time="00:00:15",
             end_time="00:00:20",
-            content="speech"
+            content="speech",
         )
         annotation2 = AudioAnnotation.objects.create(
             audio_file=audio,
             start_time="00:00:10",
             end_time="00:00:12",
-            content="music"
+            content="music",
         )
         annotations = AudioAnnotation.objects.all()
         assert annotations[0] == annotation2
