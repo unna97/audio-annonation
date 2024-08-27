@@ -1,11 +1,26 @@
-from turtle import st
 import pytest
-from waveform_audio.models import AudioAnnotation, AudioFile
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.db import models
 import os
-import datetime as dt
 import random
+
+from waveform_audio.models import AudioAnnotation, AudioFile, Subtitle
+from waveform_audio.models import TimeBoundLabelAbstract
+
+
+def test_timeboundlabelabstract_check():
+    class InvalidModel(TimeBoundLabelAbstract):
+        pass
+
+    errors = InvalidModel.check()
+    assert any(error.id == "models.E001" for error in errors)
+
+    class ValidModel(TimeBoundLabelAbstract):
+        content = models.CharField(max_length=255)
+
+    errors = ValidModel.check()
+    assert not any(error.id == "models.E001" for error in errors)
 
 
 @pytest.mark.django_db
@@ -142,3 +157,46 @@ class TestAudioAnnotationModel:
                 end_time=example_annotations[1]["end_time"],
                 content=example_annotations[1]["content"],
             )
+
+
+# Test the subtitle parser:
+
+
+@pytest.mark.django_db
+class TestSubtitleModel:
+    def test_subtitle_model_create_single_subtitle(
+        self, subtitles_list_1, audio_file_1
+    ):
+        audio = AudioFile.objects.get_or_create(file=audio_file_1)[0]
+        subtitles = Subtitle.objects.create(
+            audio_file=audio,
+            content=subtitles_list_1[0]["content"],
+            start_time=subtitles_list_1[0]["start_time"],
+            end_time=subtitles_list_1[0]["end_time"],
+        )
+        assert subtitles.content == subtitles_list_1[0]["content"]
+        assert subtitles.start_time == subtitles.parse_time(subtitles_list_1[0]["start_time"])
+        assert subtitles.end_time == subtitles.parse_time(subtitles_list_1[0]["end_time"])
+        assert subtitles.timestamp
+        assert subtitles.audio_file == audio
+
+
+    def test_subtitle_model_create_multiple_subtitles(
+            self, subtitles_list_1, audio_file_1
+    ):
+        audio = AudioFile.objects.get_or_create(file=audio_file_1)[0]
+        subtitles = [
+            Subtitle.objects.create(
+                audio_file=audio,
+                content=subtitles_list_1[i]["content"],
+                start_time=subtitles_list_1[i]["start_time"],
+                end_time=subtitles_list_1[i]["end_time"],
+            )
+            for i in range(len(subtitles_list_1))
+        ]
+        for i, subtitle in enumerate(subtitles):
+            assert subtitle.content == subtitles_list_1[i]["content"]
+            assert subtitle.start_time == subtitles[i].parse_time(subtitles_list_1[i]["start_time"])
+            assert subtitle.end_time == subtitles[i].parse_time(subtitles_list_1[i]["end_time"])
+            assert subtitle.timestamp
+            assert subtitle.audio_file == audio

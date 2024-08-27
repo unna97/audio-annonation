@@ -57,6 +57,32 @@ def subtitles_file_1():
 
 
 @pytest.fixture
+def subtitles_list_1():
+    return [
+        {
+            "content": "Fourscore and seven years ago, our fathers brought",
+            "start_time": dt.timedelta(microseconds=480000),
+            "end_time": dt.timedelta(seconds=3, microseconds=358000),
+        },
+        {
+            "content": "forth on this continent a new nation, conceived",
+            "start_time": dt.timedelta(seconds=3, microseconds=358000),
+            "end_time": dt.timedelta(seconds=6, microseconds=38000),
+        },
+        {
+            "content": "in liberty and dedicated to the proposition that",
+            "start_time": dt.timedelta(seconds=6, microseconds=38000),
+            "end_time": dt.timedelta(seconds=8, microseconds=318000),
+        },
+        {
+            "content": "all men are created equal.",
+            "start_time": dt.timedelta(seconds=8, microseconds=318000),
+            "end_time": dt.timedelta(seconds=9, microseconds=710000),
+        },
+    ]
+
+
+@pytest.fixture
 def example_annotations():
     return [
         # String time format:
