@@ -19,6 +19,13 @@
         {{ subtitle_form.as_p }}
         <button type="submit">Upload Audio and Subtitle File</button>
     </form>
+    {% if messages %}
+        <script type="text/javascript">
+            {% for message in messages %}
+            alert("{{ message|escapejs }}");
+            {% endfor %}
+        </script>
+    {% endif %}
 </body>
 
 </html>
