@@ -175,14 +175,17 @@ class TestSubtitleModel:
             end_time=subtitles_list_1[0]["end_time"],
         )
         assert subtitles.content == subtitles_list_1[0]["content"]
-        assert subtitles.start_time == subtitles.parse_time(subtitles_list_1[0]["start_time"])
-        assert subtitles.end_time == subtitles.parse_time(subtitles_list_1[0]["end_time"])
+        assert subtitles.start_time == subtitles.parse_time(
+            subtitles_list_1[0]["start_time"]
+        )
+        assert subtitles.end_time == subtitles.parse_time(
+            subtitles_list_1[0]["end_time"]
+        )
         assert subtitles.timestamp
         assert subtitles.audio_file == audio
 
-
     def test_subtitle_model_create_multiple_subtitles(
-            self, subtitles_list_1, audio_file_1
+        self, subtitles_list_1, audio_file_1
     ):
         audio = AudioFile.objects.get_or_create(file=audio_file_1)[0]
         subtitles = [
@@ -196,7 +199,11 @@ class TestSubtitleModel:
         ]
         for i, subtitle in enumerate(subtitles):
             assert subtitle.content == subtitles_list_1[i]["content"]
-            assert subtitle.start_time == subtitles[i].parse_time(subtitles_list_1[i]["start_time"])
-            assert subtitle.end_time == subtitles[i].parse_time(subtitles_list_1[i]["end_time"])
+            assert subtitle.start_time == subtitles[i].parse_time(
+                subtitles_list_1[i]["start_time"]
+            )
+            assert subtitle.end_time == subtitles[i].parse_time(
+                subtitles_list_1[i]["end_time"]
+            )
             assert subtitle.timestamp
             assert subtitle.audio_file == audio
