@@ -1,9 +1,12 @@
 # import crispy_forms.helper as crispy_helper
 from django import forms
-from .models import AudioFile, Subtitle
+from django.utils.translation import gettext_lazy as _
+
+from waveform_audio.models import AudioFile, Subtitle
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from . import utils
+from waveform_audio import utils
+import mimetypes
 
 
 # url: https://stackoverflow.com/questions/24783275/django-form-with-choices-but-also-with-freetext-option?noredirect=1&lq=1
@@ -32,19 +35,31 @@ class AudioModelFileForm(forms.ModelForm):
         model = AudioFile
         fields = ["file"]
         labels = {
-            "audio_file": "Select a file",
+            "file": "Select a file",
         }
         help_texts = {
-            "audio_file": "insert an audio file",
+            "file": "insert an audio file",
         }
         widgets = {
-            "audio_file": forms.FileInput(attrs={"accept": "audio/*"}),
+            "file": forms.FileInput(attrs={"accept": "audio/wav,audio/mp3,audio/mp4"}),
         }
+
+    def clean_file(self):
+        audio_file = self.cleaned_data.get("file")
+        print("clean_file is called")
+        if audio_file:
+            valid_mime_types = ["audio/mpeg", "audio/wav", "audio/mp3"]
+            mime_type, _ = mimetypes.guess_type(audio_file.name)
+            if mime_type is None or mime_type not in valid_mime_types:
+                raise forms.ValidationError(
+                    _("Invalid audio file type"), code="invalid_file_type"
+                )
+        return audio_file
 
 
 class SubtitleFileForm(forms.Form):
     subtitle_file = forms.FileField(
-        label="Select a file",
+        label="Select a subtitle file",
         help_text="insert a subtitle file",
         widget=forms.FileInput(attrs={"accept": ".srt"}),
     )
