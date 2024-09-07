@@ -14,7 +14,7 @@
     <div class="audio_files">
         
         <div class="audio-select" id="associated-image">
-            <img src="{% static 'media/images/chimpanzee.svg' %}" alt="My Image">
+            <img src="{% get_media_prefix %}/images/chimpanzee.svg" alt="My Image">
         </div>
         <div class="audio-select" id="dropdown-audio">
             <form action="{% url 'annotate' %}" method="post" name="selectform" id="selectform">

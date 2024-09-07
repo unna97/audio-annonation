@@ -19,7 +19,7 @@ class AudioAnnotationSerializer(serializers.ModelSerializer):
             "audio_file",
             "start_time",
             "end_time",
-            "annotation",
+            "content",
             "timestamp",
         )
 
@@ -29,6 +29,6 @@ class AudioAnnotationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.start_time = validated_data.get("start_time", instance.start_time)
         instance.end_time = validated_data.get("end_time", instance.end_time)
-        instance.annotation = validated_data.get("annotation", instance.annotation)
+        instance.content = validated_data.get("content", instance.content)
         instance.save()
         return instance
