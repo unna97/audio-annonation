@@ -27,7 +27,6 @@ class TestAudioModelFileForm:
         form = AudioModelFileForm(data={}, files=form_data)
         assert form.is_valid()
 
-    @pytest.mark.xfail("Need to correct is_valid function")
     def test_audio_model_file_form_invalid(self, subtitles_file_1):
         form_data = {"file": subtitles_file_1}
         form = AudioModelFileForm(data={}, files=form_data)
