@@ -28,7 +28,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.AudioFileAvailableView.as_view(), name="index"),
     path("annotate/", views.AnnotateAudioFileView.as_view(), name="annotate"),
-    path("save_annotations/", views.save_annotations, name="save_annotations"),
+    path(
+        "save_annotations/",
+        views.SaveAnnotationsView.as_view(),
+        name="save_annotations",
+    ),
     path(
         "upload/",
         views.UploadAudioAndSubtitleView.as_view(),

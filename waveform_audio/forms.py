@@ -46,7 +46,6 @@ class AudioModelFileForm(forms.ModelForm):
 
     def clean_file(self):
         audio_file = self.cleaned_data.get("file")
-        print("clean_file is called")
         if audio_file:
             valid_mime_types = ["audio/mpeg", "audio/wav", "audio/mp3"]
             mime_type, _ = mimetypes.guess_type(audio_file.name)

@@ -12,7 +12,7 @@ from django.views.generic.edit import FormView
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 
 
 from waveform_audio.models import AudioFile, AudioAnnotation, Subtitle
@@ -25,7 +25,6 @@ def save_annotations(request):
     if request.method == "POST":
         data = json.loads(request.body)
         annotation_table = json.loads(data.get("annotation_table"))
-        # audio_file = data.get("audio_file_path").split("/")[-1]
         audio_id = data.get("audio_id")
         print(annotation_table)
         table = pd.DataFrame(annotation_table)
@@ -179,7 +178,7 @@ class AnnotateAudioFileView(TemplateView):
         audio_file = AudioFile.objects.get(id=audio_file_id)
         context["audio_file"] = audio_file
         context["audio_file_path"] = audio_file.file.url
-        # allow these to be set by the user:
+        # TODO: allow these to be set by the user & move to configuration files:
         labels = ["laugh", "crowd", "other"]
         context["labels"] = labels
 
@@ -190,3 +189,32 @@ class AnnotateAudioFileView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
+
+
+# TODO: Make this a formset
+@method_decorator(csrf_exempt, name="dispatch")
+class SaveAnnotationsView(TemplateView):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        annotation_table = json.loads(data.get("annotation_table"))
+        audio_id = data.get("audio_id")
+
+        audio_file = get_object_or_404(AudioFile, id=audio_id)
+
+        table = pd.DataFrame(annotation_table)
+        table["start_time"] = pd.to_datetime(table["start_time"], unit="s").dt.time
+        table["end_time"] = pd.to_datetime(table["end_time"], unit="s").dt.time
+
+        annotations = [
+            AudioAnnotation(
+                audio_file=audio_file,
+                start_time=row["start_time"],
+                end_time=row["end_time"],
+                content=row["label"],
+            )
+            for _, row in table.iterrows()
+        ]
+        AudioAnnotation.objects.bulk_create(annotations)
+
+        messages.success(request, "Annotations have been saved successfully.")
+        return JsonResponse({"message": "Annotations have been saved"})
