@@ -48,7 +48,7 @@ class AudioModelFileForm(forms.ModelForm):
         audio_file = self.cleaned_data.get("file")
         if audio_file:
             valid_mime_types = ["audio/mpeg", "audio/wav", "audio/mp3"]
-            mime_type, _ = mimetypes.guess_type(audio_file.name)
+            mime_type, random_str = mimetypes.guess_type(audio_file.name)
             if mime_type is None or mime_type not in valid_mime_types:
                 raise forms.ValidationError(
                     _("Invalid audio file type"), code="invalid_file_type"
