@@ -4,13 +4,15 @@ import json
 import pandas as pd
 
 # from django.shortcuts import render
-from django.http import JsonResponse  # HttpResponse,
+from django.db import transaction
+from django.http import HttpResponse, JsonResponse  # HttpResponse,
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.views.decorators.http import require_http_methods
+from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 
 
 from waveform_audio.models import AudioFile, AudioAnnotation, Subtitle
@@ -23,7 +25,6 @@ def save_annotations(request):
     if request.method == "POST":
         data = json.loads(request.body)
         annotation_table = json.loads(data.get("annotation_table"))
-        # audio_file = data.get("audio_file_path").split("/")[-1]
         audio_id = data.get("audio_id")
         print(annotation_table)
         table = pd.DataFrame(annotation_table)
@@ -37,7 +38,7 @@ def save_annotations(request):
                 audio_file=AudioFile.objects.get(id=audio_id),
                 start_time=row["start_time"],
                 end_time=row["end_time"],
-                annotation=row["label"],
+                content=row["label"],
             )
         # provide a popup message that annotations have been saved:
         return JsonResponse({"message": "Annotations have been saved"})
@@ -62,7 +63,7 @@ class UploadAudioAndSubtitleView(FormView):
     template_name = "upload.html"
     audio_form_class = AudioModelFileForm
     subtitle_form_class = SubtitleFileForm
-    success_url = "/api/audio-files"
+    success_url = "/"
 
     def get(self, request, *args, **kwargs):
         audio_form = self.audio_form_class()
@@ -77,19 +78,8 @@ class UploadAudioAndSubtitleView(FormView):
         audio_form = self.audio_form_class(request.POST, request.FILES)
         subtitle_form = self.subtitle_form_class(request.POST, request.FILES)
 
-        if audio_form.is_valid():
-            audio_file_instance = audio_form.save()
-            # if the file is already in the database:
-            if AudioFile.objects.filter(file=audio_file_instance.file).exists():
-                audio_file_instance = AudioFile.objects.get(
-                    file=audio_file_instance.file
-                )
-
-            if subtitle_form.is_valid():
-                subtitle_file = request.FILES["subtitle_file"]
-                subtitle_texts = utils.process_subtitle_file(subtitle_file)
-                # TODO: The returned subtitles should be used to inform success
-                self.save_subtitle_data(audio_file_instance, subtitle_texts)
+        if audio_form.is_valid() and subtitle_form.is_valid():
+            return self.form_valid(audio_form, subtitle_form)
 
         else:
             # show the errors in the form:
@@ -98,17 +88,34 @@ class UploadAudioAndSubtitleView(FormView):
             errors = audio_form.errors | subtitle_form.errors
             return JsonResponse({"message": "", "errors": errors})
 
-        return redirect(self.success_url)
+    @transaction.atomic
+    def form_valid(self, audio_form, subtitle_form):
+        # save the audio file:
 
-    def save_subtitle_data(self, audio_file_instance, subtitle_texts):
-        # save the subtitle data to the database:
-        subtitle_data = [
-            {**s, "audio_file": audio_file_instance} for s in subtitle_texts
-        ]
-        # TODO: Figure out how to do bulk create
-        subtitle_data_obj = [Subtitle.objects.create(**s) for s in subtitle_data]
+        audio_file_instance = audio_form.save()
+        # save the subtitle file:
+        subtitle_texts = subtitle_form.save(audio_file_instance)
+        messages.success(
+            self.request,
+            f"Audio file and {len(subtitle_texts)} subtitles for {audio_file_instance} saved",
+        )
+        return render(
+            self.request,
+            self.template_name,
+            {"audio_form": audio_form, "subtitle_form": subtitle_form},
+        )
 
-        return subtitle_data_obj
+    # TODO: Handle Intergrity Exception from AudioModel, currently form saves audio file
+    def form_invalid(self, audio_form, subtitle_form):
+        messages.error(
+            self.request,
+            "There was an error with your submission. Please check the form.",
+        )
+        return render(
+            self.request,
+            self.template_name,
+            {"audio_form": audio_form, "subtitle_form": subtitle_form},
+        )
 
 
 # show save annotations for the selected audio file:
@@ -133,7 +140,7 @@ class AudioAnnotationsTableView(TemplateView):
                     "audio_file__file",
                     "start_time",
                     "end_time",
-                    "annotation",
+                    "content",
                     "timestamp",
                     "id",
                 )
@@ -145,12 +152,12 @@ class AudioAnnotationsTableView(TemplateView):
             context["message"] = message
             return context
 
-        annotations["start_time"] = annotations["start_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
-        annotations["end_time"] = annotations["end_time"].apply(
-            lambda x: x.strftime("%H:%M:%S")
-        )
+        annotations["start_time"] = annotations["start_time"]  # .apply(
+        #     lambda x: x.strftime("%H:%M:%S")
+        # )
+        annotations["end_time"] = annotations["end_time"]  # .apply(
+        #    lambda x: x.strftime("%H:%M:%S")
+        # )
         context = {"annotations": annotations.to_dict(orient="records")}
 
         return context
@@ -171,7 +178,7 @@ class AnnotateAudioFileView(TemplateView):
         audio_file = AudioFile.objects.get(id=audio_file_id)
         context["audio_file"] = audio_file
         context["audio_file_path"] = audio_file.file.url
-        # allow these to be set by the user:
+        # TODO: allow these to be set by the user & move to configuration files:
         labels = ["laugh", "crowd", "other"]
         context["labels"] = labels
 
@@ -182,3 +189,32 @@ class AnnotateAudioFileView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
+
+
+# TODO: Make this a formset
+@method_decorator(csrf_exempt, name="dispatch")
+class SaveAnnotationsView(TemplateView):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        annotation_table = json.loads(data.get("annotation_table"))
+        audio_id = data.get("audio_id")
+
+        audio_file = get_object_or_404(AudioFile, id=audio_id)
+
+        table = pd.DataFrame(annotation_table)
+        table["start_time"] = pd.to_datetime(table["start_time"], unit="s").dt.time
+        table["end_time"] = pd.to_datetime(table["end_time"], unit="s").dt.time
+
+        annotations = [
+            AudioAnnotation(
+                audio_file=audio_file,
+                start_time=row["start_time"],
+                end_time=row["end_time"],
+                content=row["label"],
+            )
+            for _, row in table.iterrows()
+        ]
+        AudioAnnotation.objects.bulk_create(annotations)
+
+        messages.success(request, "Annotations have been saved successfully.")
+        return JsonResponse({"message": "Annotations have been saved"})
